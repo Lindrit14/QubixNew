@@ -1,47 +1,152 @@
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, TouchableOpacity, ScrollView, StyleSheet, Button } from 'react-native';
+import RubiksCube3D from './RubiksCube3D';
+import solver from 'rubiks-cube-solver';
+import {
+  rotateRight,
+  rotateRightInverse,
+  rotateUp,
+  rotateUpInverse,
+  rotateFront,
+  rotateFrontInverse,
+  rotateLeft,
+  rotateLeftInverse,
+  rotateDown,
+  rotateDownInverse,
+  rotateBack,
+  rotateBackInverse,
+} from './cubeRotation';
 
-function SolutionScreen({ route, navigation }) {
-  const { cubeConfig } = route.params;
-  const solutionSteps = solveRubiksCube(cubeConfig);
+const SolutionScreen = ({ route, navigation }) => {
+  const { cubeState } = route.params;
+  const [rotation, setRotation] = useState([0, 0, 0]);
   const [currentStep, setCurrentStep] = useState(0);
+  const [solutionSteps, setSolutionSteps] = useState([]);
+  const [currentCubeState, setCurrentCubeState] = useState(cubeState);
+
+  useEffect(() => {
+    // Ensure each face is represented by single characters for each color
+    const cubeString = [
+      cubeState.F.join(''), // front
+      cubeState.R.join(''), // right
+      cubeState.U.join(''), // up
+      cubeState.D.join(''), // down
+      cubeState.L.join(''), // left
+      cubeState.B.join('')  // back
+    ].join('');
+
+    console.log(cubeString); // For debugging
+
+    if (cubeString.length !== 54) {
+      console.error('Invalid cube state:', cubeString);
+      return;
+    }
+
+    try {
+      const moves = solver(cubeString);
+      setSolutionSteps(moves.split(' '));
+    } catch (error) {
+      console.error('Error solving cube:', error);
+    }
+  }, [cubeState]);
+
+  const rotateCube = (axis, value) => {
+    setRotation(prevRotation => {
+      const newRotation = [...prevRotation];
+      newRotation[axis] += value;
+      return newRotation;
+    });
+  };
 
   const nextStep = () => {
-    if (currentStep < solutionSteps.length - 1) {
+    if (currentStep < solutionSteps.length) {
+      const step = solutionSteps[currentStep];
+      handleStep(step);
       setCurrentStep(currentStep + 1);
     }
   };
 
-  function solveRubiksCube(config) {
-    // In a real app, this function would analyze the 'config' to compute a solution.
-    // For now, we return a dummy solution that represents a typical sequence of moves.
-    return ["R", "U", "R'", "U'", "R'", "F", "R2", "U'", "R'", "U'", "R", "U", "R'", "F'"];
-  }
-
-  const prevStep = () => {
-    if (currentStep > 0) {
-      setCurrentStep(currentStep - 1);
+  const handleStep = (step) => {
+    switch (step) {
+      case 'R':
+        setCurrentCubeState(prevState => rotateRight(prevState));
+        break;
+      case 'R\'':
+        setCurrentCubeState(prevState => rotateRightInverse(prevState));
+        break;
+      case 'U':
+        setCurrentCubeState(prevState => rotateUp(prevState));
+        break;
+      case 'U\'':
+        setCurrentCubeState(prevState => rotateUpInverse(prevState));
+        break;
+      case 'F':
+        setCurrentCubeState(prevState => rotateFront(prevState));
+        break;
+      case 'F\'':
+        setCurrentCubeState(prevState => rotateFrontInverse(prevState));
+        break;
+      case 'L':
+        setCurrentCubeState(prevState => rotateLeft(prevState));
+        break;
+      case 'L\'':
+        setCurrentCubeState(prevState => rotateLeftInverse(prevState));
+        break;
+      case 'D':
+        setCurrentCubeState(prevState => rotateDown(prevState));
+        break;
+      case 'D\'':
+        setCurrentCubeState(prevState => rotateDownInverse(prevState));
+        break;
+      case 'B':
+        setCurrentCubeState(prevState => rotateBack(prevState));
+        break;
+      case 'B\'':
+        setCurrentCubeState(prevState => rotateBackInverse(prevState));
+        break;
+      default:
+        console.log('Unknown step:', step);
     }
+  };
+
+  const resetCube = () => {
+    setCurrentCubeState(cubeState);
+    setCurrentStep(0);
+    setRotation([0, 0, 0]);
   };
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title}>Solution Steps</Text>
-      <Text style={styles.step}>Step {currentStep + 1}: {solutionSteps[currentStep]}</Text>
-      <View style={styles.navigation}>
-        <TouchableOpacity style={styles.button} onPress={prevStep} disabled={currentStep === 0}>
-          <Text>Previous</Text>
+      <Text style={styles.title}>Solution Screen</Text>
+      <View style={styles.cube3DContainer}>
+        <RubiksCube3D cubeState={currentCubeState} rotation={rotation} />
+      </View>
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity style={styles.button} onPress={() => rotateCube(0, Math.PI / 6)}>
+          <Text>Up</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.button} onPress={nextStep} disabled={currentStep === solutionSteps.length - 1}>
-          <Text>Next</Text>
+        <TouchableOpacity style={styles.button} onPress={() => rotateCube(0, -Math.PI / 6)}>
+          <Text>Down</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.button} onPress={() => rotateCube(1, Math.PI / 6)}>
+          <Text>Left</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.button} onPress={() => rotateCube(1, -Math.PI / 6)}>
+          <Text>Right</Text>
         </TouchableOpacity>
       </View>
+      <View style={styles.stepButtonContainer}>
+        <Button title="Next Step" onPress={nextStep} />
+        <Button title="Reset" onPress={resetCube} color="red" />
+      </View>
+      <Text style={styles.stepText}>Current Step: {solutionSteps[currentStep]}</Text>
+      <Text style={styles.solutionText}>Solution Moves: {solutionSteps.join(' ')}</Text>
       <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
         <Text>Back to Input</Text>
       </TouchableOpacity>
     </ScrollView>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -55,12 +160,12 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 20,
   },
-  step: {
-    fontSize: 20,
-    color: 'navy',
+  cube3DContainer: {
+    height: 300,
+    width: 300,
     marginBottom: 20,
   },
-  navigation: {
+  buttonContainer: {
     flexDirection: 'row',
     justifyContent: 'space-around',
     width: '100%',
@@ -70,13 +175,24 @@ const styles = StyleSheet.create({
     padding: 10,
     backgroundColor: 'lightblue',
     opacity: 0.8,
-    borderRadius: 5
+    borderRadius: 5,
+  },
+  stepButtonContainer: {
+    marginBottom: 20,
+  },
+  stepText: {
+    fontSize: 18,
+    marginTop: 10,
+  },
+  solutionText: {
+    fontSize: 18,
+    marginTop: 10,
   },
   backButton: {
     marginTop: 20,
     backgroundColor: 'lightblue',
     padding: 10,
-    borderRadius: 5
+    borderRadius: 5,
   },
 });
 

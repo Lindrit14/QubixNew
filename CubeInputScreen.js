@@ -44,22 +44,13 @@ const CubeInputScreen = () => {
   };
 
   const checkSolvability = () => {
-    // Flatten the cubeState and count occurrences of each color
     const colorCounts = Object.values(cubeState).flat().reduce((acc, color) => {
       acc[color] = (acc[color] || 0) + 1;
       return acc;
     }, {});
 
-    // Check if each color appears exactly 9 times
     const isSolvable = Object.values(colorCounts).every(count => count === 9);
     setIsSolvable(isSolvable);
-  };
-
-
-  const randomizeCube = () => {
-    const cube = Cubejs.random();
-    // Assume we have a function to map this random cube state back to the UI's cubeState format
-    setCubeState(parseCubeString(cube.asString()));
   };
 
   const resetCube = () => {
@@ -71,7 +62,7 @@ const CubeInputScreen = () => {
       B: [...initialFaceState],
       D: [...initialFaceState]
     });
-    setIsSolvable(false); // Reset solvability status
+    setIsSolvable(false);
   };
 
   return (
@@ -90,29 +81,29 @@ const CubeInputScreen = () => {
       <View style={styles.faceContainer}>
         <View style={styles.rowContainer}>
           <View>
-            <Text style={{ color: 'white' }}>1</Text>
+            <Text style={styles.faceTitle}>Up</Text>
             <CubeFace faceConfig={cubeState.U} onColorChange={(index) => handleColorChange('U', index)} />
           </View>
           <View>
-            <Text style={{ color: 'white' }}>2</Text>
+            <Text style={styles.faceTitle}>Left</Text>
             <CubeFace faceConfig={cubeState.L} onColorChange={(index) => handleColorChange('L', index)} />
           </View>
           <View>
-            <Text style={{ color: 'white' }}>3</Text>
+            <Text style={styles.faceTitle}>Front</Text>
             <CubeFace faceConfig={cubeState.F} onColorChange={(index) => handleColorChange('F', index)} />
           </View>
         </View>
         <View style={styles.rowContainer}>
           <View>
-            <Text style={{ color: 'white' }}>4</Text>
+            <Text style={styles.faceTitle}>Right</Text>
             <CubeFace faceConfig={cubeState.R} onColorChange={(index) => handleColorChange('R', index)} />
           </View>
           <View>
-            <Text style={{ color: 'white' }}>5</Text>
+            <Text style={styles.faceTitle}>Back</Text>
             <CubeFace faceConfig={cubeState.B} onColorChange={(index) => handleColorChange('B', index)} />
           </View>
           <View>
-            <Text style={{ color: 'white' }}>6</Text>
+            <Text style={styles.faceTitle}>Down</Text>
             <CubeFace faceConfig={cubeState.D} onColorChange={(index) => handleColorChange('D', index)} />
           </View>
         </View>
@@ -125,6 +116,11 @@ const CubeInputScreen = () => {
           disabled={!isSolvable}
         />
         <Button
+          title="Input Info"
+          onPress={() => navigation.navigate('InputInfo')}
+          color="blue"
+        />
+        <Button
           title="Logout"
           onPress={handleLogout}
           color='red'
@@ -135,7 +131,6 @@ const CubeInputScreen = () => {
           color="red"
         />
       </View>
-
     </ScrollView>
   );
 };
@@ -168,13 +163,29 @@ const styles = StyleSheet.create({
     fontSize: 18,
     marginBottom: 20
   },
+  faceContainer: {
+    flexDirection: 'column',
+    alignItems: 'center',
+  },
   rowContainer: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    width: '100%',  // Take full width to space items evenly
+    width: '100%',
     marginBottom: 10
-  }
+  },
+  faceTitle: {
+    color: 'white',
+    textAlign: 'center',
+    marginBottom: 5
+  },
+  cube3DContainer: {
+    height: 300,
+    width: 300,
+    marginBottom: 20,
+  },
+  buttonContainer: {
+    marginTop: 20,
+  },
 });
-
 
 export default CubeInputScreen;

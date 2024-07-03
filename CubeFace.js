@@ -1,13 +1,14 @@
+// CubeFace.js
 import React from 'react';
 import { View, TouchableOpacity, StyleSheet } from 'react-native';
 
 const CubeFace = ({ faceConfig, onColorChange }) => {
   return (
-    <View style={styles.grid}>
+    <View style={styles.faceContainer}>
       {faceConfig.map((color, index) => (
         <TouchableOpacity
           key={index}
-          style={[styles.cubePiece, { backgroundColor: color }]}
+          style={[styles.square, { backgroundColor: color }]}
           onPress={() => onColorChange(index)}
         />
       ))}
@@ -16,17 +17,18 @@ const CubeFace = ({ faceConfig, onColorChange }) => {
 };
 
 const styles = StyleSheet.create({
-  grid: {
+  faceContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    width: 100,  // Adjust the size based on your screen layout
-    margin: 5,
+    width: 90,
+    height: 90,
   },
-  cubePiece: {
+  square: {
     width: 30,
     height: 30,
-    margin: 1,
-  }
+    borderWidth: 1,
+    borderColor: 'black',
+  },
 });
 
 export default CubeFace;
