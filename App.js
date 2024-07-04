@@ -8,6 +8,7 @@ import RegisterScreen from './registerScreen';
 import CubeInputScreen from './CubeInputScreen';
 import SolutionScreen from './SolutionScreen';
 import InputInfoScreen from './InputInfoScreen';
+import HistoryScreen from './HistoryScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -30,6 +31,7 @@ export default function App() {
             <Stack.Screen name="CubeInput" component={CubeInputScreen} />
             <Stack.Screen name="Solution" component={SolutionScreen} />
             <Stack.Screen name="InputInfo" component={InputInfoScreen} />
+            <Stack.Screen name="History" component={HistoryScreen} />
           </>
         ) : (
           <>

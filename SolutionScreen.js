@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, StyleSheet, Button } from 'react-native';
 import RubiksCube3D from './RubiksCube3D';
 import solver from 'rubiks-cube-solver';
+import { saveSolve, getSolvingHistory } from './solvingHistory';
 import {
   rotateRight,
   rotateRightInverse,
@@ -40,6 +41,7 @@ const SolutionScreen = ({ route, navigation }) => {
   const [currentCubeState, setCurrentCubeState] = useState(cubeState);
   const [cubeHistory, setCubeHistory] = useState([cubeState]);
   const [originalCubeState, setOriginalCubeState] = useState(cubeState);
+  const [solvingHistory, setSolvingHistory] = useState([]);
 
   const colorToChar = {
     green: 'f',
@@ -109,6 +111,16 @@ const SolutionScreen = ({ route, navigation }) => {
     }
   }, [cubeState]);
 
+  useEffect(() => {
+    const fetchSolvingHistory = async () => {
+      const history = await getSolvingHistory();
+      console.log('Solving history on mount:', history);
+      setSolvingHistory(history);
+    };
+
+    fetchSolvingHistory();
+  }, []);
+
   const rotateCube = (axis, value) => {
     setRotation(prevRotation => {
       const newRotation = [...prevRotation];
@@ -151,11 +163,20 @@ const SolutionScreen = ({ route, navigation }) => {
     console.log(`Cube State after ${step}:`, JSON.stringify(state, null, 2));
   };
 
-  const nextStep = () => {
+  const nextStep = async () => {
     if (currentStep < solutionSteps.length) {
       const step = solutionSteps[currentStep];
       handleStep(step);
       setCurrentStep(currentStep + 1);
+    } else if (currentStep === solutionSteps.length) {
+      const solve = {
+        date: new Date().toISOString(),
+        steps: solutionSteps,
+      };
+      console.log('Saving current solve:', solve);
+      await saveSolve(solve);
+      const history = await getSolvingHistory();
+      setSolvingHistory(history);
     }
   };
 
@@ -283,6 +304,11 @@ const SolutionScreen = ({ route, navigation }) => {
       </View>
       <Text style={styles.stepText}>Current Step: {solutionSteps[currentStep]}</Text>
       <Text style={styles.solutionText}>Solution Moves: {solutionSteps.join(' ')}</Text>
+      {/* <Text style={styles.historyTitle}>Solving History:</Text>
+      {solvingHistory.map((solve, index) => (
+        <Text key={index}>{`${solve.date} - Steps: ${solve.steps.join(' ')}`}</Text>
+      ))}
+        */}
       <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
         <Text>Back to Input</Text>
       </TouchableOpacity>
@@ -333,6 +359,12 @@ const styles = StyleSheet.create({
     fontSize: 18,
     marginTop: 10,
     color: 'white'
+  },
+  historyTitle: {
+    fontSize: 18,
+    marginTop: 20,
+    color: 'white',
+    fontWeight: 'bold',
   },
   backButton: {
     marginTop: 20,
