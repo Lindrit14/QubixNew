@@ -283,9 +283,6 @@ const SolutionScreen = ({ route, navigation }) => {
       </View>
       <Text style={styles.stepText}>Current Step: {solutionSteps[currentStep]}</Text>
       <Text style={styles.solutionText}>Solution Moves: {solutionSteps.join(' ')}</Text>
-      <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-        <Text>Back to Input</Text>
-      </TouchableOpacity>
     </ScrollView>
   );
 };

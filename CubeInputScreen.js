@@ -4,7 +4,7 @@ import CubeFace from './CubeFace';
 import { useNavigation } from '@react-navigation/native';
 import { signOut } from 'firebase/auth';
 import { auth } from './firebaseConfig';
-import solver from 'rubiks-cube-solver'; // Ensure you have this package installed
+import solver from 'rubiks-cube-solver';
 
 const initialFaceState = new Array(9).fill('white');
 
@@ -155,11 +155,11 @@ const CubeInputScreen = () => {
         <TouchableOpacity style={[styles.actionButton, { backgroundColor: 'blue' }]} onPress={() => navigation.navigate('InputInfo')}>
           <Text style={styles.buttonText}>Input Info</Text>
         </TouchableOpacity>
+        <TouchableOpacity style={[styles.actionButton, { backgroundColor: 'orange' }]} onPress={resetCube}>
+          <Text style={styles.buttonText}>Reset Cube</Text>
+        </TouchableOpacity>
         <TouchableOpacity style={[styles.actionButton, { backgroundColor: 'red' }]} onPress={handleLogout}>
           <Text style={styles.buttonText}>Logout</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={[styles.actionButton, { backgroundColor: 'red' }]} onPress={resetCube}>
-          <Text style={styles.buttonText}>Reset Cube</Text>
         </TouchableOpacity>
       </View>
       <Modal visible={loading} transparent>
