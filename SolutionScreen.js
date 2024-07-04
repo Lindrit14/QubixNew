@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, StyleSheet, Button } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Button, FlatList, Alert } from 'react-native';
 import RubiksCube3D from './RubiksCube3D';
 import solver from 'rubiks-cube-solver';
 import {
@@ -39,7 +39,27 @@ const SolutionScreen = ({ route, navigation }) => {
   const [solutionSteps, setSolutionSteps] = useState([]);
   const [currentCubeState, setCurrentCubeState] = useState(cubeState);
   const [cubeHistory, setCubeHistory] = useState([cubeState]);
-  const [originalCubeState, setOriginalCubeState] = useState(cubeState);
+  const [startTime, setStartTime] = useState(null);
+  const [stepTimes, setStepTimes] = useState([]);
+  const [overallTime, setOverallTime] = useState(0);
+  const [isSolved, setIsSolved] = useState(false);
+  const [stepStartTime, setStepStartTime] = useState(null);
+
+  useEffect(() => {
+    const initialTime = new Date();
+    setStartTime(initialTime);
+    setStepStartTime(initialTime);
+  }, []);
+
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (!isSolved && startTime) {
+        setOverallTime((new Date() - startTime) / 1000);
+      }
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [isSolved, startTime]);
 
   const colorToChar = {
     green: 'f',
@@ -75,6 +95,18 @@ const SolutionScreen = ({ route, navigation }) => {
     return Object.values(colorCounts).every(count => count === 9);
   };
 
+  const checkIfSolved = (cubeState) => {
+    const solvedState = {
+      U: Array(9).fill('white'),
+      L: Array(9).fill('orange'),
+      F: Array(9).fill('green'),
+      R: Array(9).fill('red'),
+      B: Array(9).fill('blue'),
+      D: Array(9).fill('yellow')
+    };
+    return JSON.stringify(cubeState) === JSON.stringify(solvedState);
+  };
+
   useEffect(() => {
     const cubeString = [
       cubeState.F.join(''), // front
@@ -95,15 +127,17 @@ const SolutionScreen = ({ route, navigation }) => {
       return;
     }
 
-    if (filteredCubeString === 'fffffffffrrrrrrrrruuuuuuuuudddddddddlllllllllbbbbbbbbb') {
+    if (checkIfSolved(cubeState)) {
       console.log('The cube is already solved.');
       setSolutionSteps(['Cube is already solved.']);
+      setIsSolved(true);
       return;
     }
 
     try {
       const moves = solver(filteredCubeString);
       setSolutionSteps(moves.split(' '));
+      setStartTime(new Date());
     } catch (error) {
       console.error('Error solving cube:', error);
     }
@@ -154,18 +188,41 @@ const SolutionScreen = ({ route, navigation }) => {
   const nextStep = () => {
     if (currentStep < solutionSteps.length) {
       const step = solutionSteps[currentStep];
+      const stepStart = stepStartTime || new Date();
       handleStep(step);
+      const stepEndTime = new Date();
+      const stepDuration = (stepEndTime - stepStart) / 1000;
+
+      setStepTimes(prevStepTimes => [
+        ...prevStepTimes,
+        { step, duration: stepDuration }
+      ]);
+
+      setStepStartTime(stepEndTime); // Update stepStartTime after recording the duration
       setCurrentStep(currentStep + 1);
+
+      if (checkIfSolved(currentCubeState)) {
+        setIsSolved(true);
+        Alert.alert("Cube Solved!", `Congratulations! You have solved the cube in ${overallTime.toFixed(2)} seconds.`);
+      }
+    } else {
+      if (!isSolved) {
+        setIsSolved(true);
+        Alert.alert("Cube Solved!", `Congratulations! You have solved the cube in ${overallTime.toFixed(2)} seconds.`);
+      }
     }
   };
+
 
   const prevStep = () => {
     if (currentStep > 0) {
       const prevStep = solutionSteps[currentStep - 1];
       handleStep(inverseMoves[prevStep]);
       setCurrentStep(currentStep - 1);
+      setStepTimes(prevStepTimes => prevStepTimes.slice(0, -1));
     }
   };
+
 
   const handleStep = (step) => {
     let newState;
@@ -250,15 +307,23 @@ const SolutionScreen = ({ route, navigation }) => {
     logCubeState(newState, step);
     setCurrentCubeState(newState);
     setCubeHistory([...cubeHistory, newState]);
+    setStepStartTime(new Date());
   };
 
   const resetCube = () => {
     setRotation([0, 0, 0]);
   };
 
+  const renderStep = ({ item, index }) => (
+    <Text style={styles.stepText}>Step {index + 1}: {item}</Text>
+  );
+
+  const totalTimeTaken = stepTimes.reduce((acc, curr) => acc + curr.duration, 0).toFixed(2);
+
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <View style={styles.container}>
       <Text style={styles.title}>Solution Screen</Text>
+      <Text style={styles.timerText}>Time: {overallTime.toFixed(2)}s</Text>
       <View style={styles.cube3DContainer}>
         <RubiksCube3D cubeState={currentCubeState} rotation={rotation} />
       </View>
@@ -280,10 +345,19 @@ const SolutionScreen = ({ route, navigation }) => {
         <Button title="Next Step" onPress={nextStep} />
         <Button title="Step Back" onPress={prevStep} />
         <Button title="Reset Position" onPress={resetCube} color="red" />
+        <Button title="Show Analysis" onPress={() => navigation.navigate('Analysis', { stepTimes, totalTimeTaken: overallTime.toFixed(2) })} />
       </View>
-      <Text style={styles.stepText}>Current Step: {solutionSteps[currentStep]}</Text>
+      {!isSolved && (
+        <FlatList
+          data={solutionSteps}
+          renderItem={renderStep}
+          keyExtractor={(item, index) => index.toString()}
+          style={styles.stepList}
+        />
+      )}
+      <Text style={styles.currentStepText}>Current Step: {solutionSteps[currentStep]}</Text>
       <Text style={styles.solutionText}>Solution Moves: {solutionSteps.join(' ')}</Text>
-    </ScrollView>
+    </View>
   );
 };
 
@@ -300,6 +374,13 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 20,
     color: 'white'
+  },
+  timerText: {
+    fontSize: 14,
+    color: 'white',
+    position: 'absolute',
+    top: 10,
+    right: 10,
   },
   cube3DContainer: {
     height: 300,
@@ -323,6 +404,13 @@ const styles = StyleSheet.create({
   },
   stepText: {
     fontSize: 18,
+    color: 'white',
+  },
+  stepList: {
+    width: '100%',
+  },
+  currentStepText: {
+    fontSize: 18,
     marginTop: 10,
     color: 'white'
   },
@@ -330,12 +418,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     marginTop: 10,
     color: 'white'
-  },
-  backButton: {
-    marginTop: 20,
-    backgroundColor: 'lightblue',
-    padding: 10,
-    borderRadius: 5,
   },
 });
 
