@@ -5,16 +5,31 @@ import solver from 'rubiks-cube-solver';
 import {
   rotateRight,
   rotateRightInverse,
+  rotateRight180,
   rotateUp,
   rotateUpInverse,
+  rotateUp180,
   rotateFront,
   rotateFrontInverse,
+  rotateFront180,
   rotateLeft,
   rotateLeftInverse,
+  rotateLeft180,
   rotateDown,
   rotateDownInverse,
+  rotateDown180,
   rotateBack,
   rotateBackInverse,
+  rotateBack180,
+  rotateMiddle,
+  rotateMiddleInverse,
+  rotateMiddle180,
+  rotateEquatorial,
+  rotateEquatorialInverse,
+  rotateEquatorial180,
+  rotateStanding,
+  rotateStandingInverse,
+  rotateStanding180,
 } from './cubeRotation';
 
 const SolutionScreen = ({ route, navigation }) => {
@@ -23,9 +38,43 @@ const SolutionScreen = ({ route, navigation }) => {
   const [currentStep, setCurrentStep] = useState(0);
   const [solutionSteps, setSolutionSteps] = useState([]);
   const [currentCubeState, setCurrentCubeState] = useState(cubeState);
+  const [cubeHistory, setCubeHistory] = useState([cubeState]);
+
+  const colorToChar = {
+    green: 'f',
+    orange: 'l',
+    white: 'u',
+    red: 'r',
+    blue: 'b',
+    yellow: 'd'
+  };
+
+  const mapColorsToChars = (str) => {
+    return str.replace(/green|orange|white|red|blue|yellow/g, matched => colorToChar[matched]);
+  };
+
+  const isValidCubeState = (cubeString) => {
+    const colorCounts = {
+      f: 0,
+      l: 0,
+      u: 0,
+      d: 0,
+      r: 0,
+      b: 0
+    };
+
+    for (const char of cubeString) {
+      if (colorCounts[char] !== undefined) {
+        colorCounts[char]++;
+      } else {
+        return false;
+      }
+    }
+
+    return Object.values(colorCounts).every(count => count === 9);
+  };
 
   useEffect(() => {
-    // Ensure each face is represented by single characters for each color
     const cubeString = [
       cubeState.F.join(''), // front
       cubeState.R.join(''), // right
@@ -35,15 +84,24 @@ const SolutionScreen = ({ route, navigation }) => {
       cubeState.B.join('')  // back
     ].join('');
 
-    console.log(cubeString); // For debugging
+    const filteredCubeString = mapColorsToChars(cubeString);
 
-    if (cubeString.length !== 54) {
-      console.error('Invalid cube state:', cubeString);
+    console.log('Original Cube State:', cubeState);
+    console.log('Filtered Cube String:', filteredCubeString); // Debugging output
+
+    if (filteredCubeString.length !== 54 || !isValidCubeState(filteredCubeString)) {
+      console.error('Invalid cube state:', filteredCubeString);
+      return;
+    }
+
+    if (filteredCubeString === 'fffffffffllllllllluuuuuuuuudddddddddrrrrrrrrrbbbbbbbbb') {
+      console.log('The cube is already solved.');
+      setSolutionSteps(['Cube is already solved.']);
       return;
     }
 
     try {
-      const moves = solver(cubeString);
+      const moves = solver(filteredCubeString);
       setSolutionSteps(moves.split(' '));
     } catch (error) {
       console.error('Error solving cube:', error);
@@ -66,52 +124,100 @@ const SolutionScreen = ({ route, navigation }) => {
     }
   };
 
+  const prevStep = () => {
+    if (currentStep > 0) {
+      setCurrentStep(currentStep - 1);
+      setCurrentCubeState(cubeHistory[currentStep - 1]);
+    }
+  };
+
   const handleStep = (step) => {
+    let newState;
     switch (step) {
       case 'R':
-        setCurrentCubeState(prevState => rotateRight(prevState));
+        newState = rotateRight(currentCubeState);
         break;
-      case 'R\'':
-        setCurrentCubeState(prevState => rotateRightInverse(prevState));
+      case "Rprime":
+        newState = rotateRightInverse(currentCubeState);
+        break;
+      case 'R2':
+        newState = rotateRight180(currentCubeState);
         break;
       case 'U':
-        setCurrentCubeState(prevState => rotateUp(prevState));
+        newState = rotateUp(currentCubeState);
         break;
-      case 'U\'':
-        setCurrentCubeState(prevState => rotateUpInverse(prevState));
+      case "Uprime":
+        newState = rotateUpInverse(currentCubeState);
+        break;
+      case 'U2':
+        newState = rotateUp180(currentCubeState);
         break;
       case 'F':
-        setCurrentCubeState(prevState => rotateFront(prevState));
+        newState = rotateFront(currentCubeState);
         break;
-      case 'F\'':
-        setCurrentCubeState(prevState => rotateFrontInverse(prevState));
+      case "Fprime":
+        newState = rotateFrontInverse(currentCubeState);
+        break;
+      case 'F2':
+        newState = rotateFront180(currentCubeState);
         break;
       case 'L':
-        setCurrentCubeState(prevState => rotateLeft(prevState));
+        newState = rotateLeft(currentCubeState);
         break;
-      case 'L\'':
-        setCurrentCubeState(prevState => rotateLeftInverse(prevState));
+      case "Lprime":
+        newState = rotateLeftInverse(currentCubeState);
+        break;
+      case 'L2':
+        newState = rotateLeft180(currentCubeState);
         break;
       case 'D':
-        setCurrentCubeState(prevState => rotateDown(prevState));
+        newState = rotateDown(currentCubeState);
         break;
-      case 'D\'':
-        setCurrentCubeState(prevState => rotateDownInverse(prevState));
+      case "Dprime":
+        newState = rotateDownInverse(currentCubeState);
+        break;
+      case 'D2':
+        newState = rotateDown180(currentCubeState);
         break;
       case 'B':
-        setCurrentCubeState(prevState => rotateBack(prevState));
+        newState = rotateBack(currentCubeState);
         break;
-      case 'B\'':
-        setCurrentCubeState(prevState => rotateBackInverse(prevState));
+      case "Bprime":
+        newState = rotateBackInverse(currentCubeState);
+        break;
+      case 'B2':
+        newState = rotateBack180(currentCubeState);
+        break;
+      case 'M':
+        newState = rotateMiddle(currentCubeState);
+        break;
+      case "Mprime":
+        newState = rotateMiddleInverse(currentCubeState);
+        break;
+      case 'E':
+        newState = rotateEquatorial(currentCubeState);
+        break;
+      case "Eprime":
+        newState = rotateEquatorialInverse(currentCubeState);
+        break;
+      case 'S':
+        newState = rotateStanding(currentCubeState);
+        break;
+      case "Sprime":
+        newState = rotateStandingInverse(currentCubeState);
         break;
       default:
         console.log('Unknown step:', step);
+        return;
     }
+    setCurrentCubeState(newState);
+    setCubeHistory([...cubeHistory, newState]);
   };
 
   const resetCube = () => {
     setCurrentCubeState(cubeState);
     setCurrentStep(0);
+    setCubeHistory([cubeState]);
     setRotation([0, 0, 0]);
   };
 
@@ -137,6 +243,7 @@ const SolutionScreen = ({ route, navigation }) => {
       </View>
       <View style={styles.stepButtonContainer}>
         <Button title="Next Step" onPress={nextStep} />
+        <Button title="Step Back" onPress={prevStep} />
         <Button title="Reset" onPress={resetCube} color="red" />
       </View>
       <Text style={styles.stepText}>Current Step: {solutionSteps[currentStep]}</Text>

@@ -14,6 +14,14 @@ const rotateFaceCounterClockwise = (face) => {
     ];
 };
 
+const rotateFace180 = (face) => {
+    return [
+        face[8], face[7], face[6],
+        face[5], face[4], face[3],
+        face[2], face[1], face[0]
+    ];
+};
+
 const rotateRight = (cube) => {
     const newCube = { ...cube };
     newCube.R = rotateFaceClockwise(cube.R);
@@ -23,17 +31,17 @@ const rotateRight = (cube) => {
     const tempD = [cube.D[2], cube.D[5], cube.D[8]];
     const tempB = [cube.B[6], cube.B[3], cube.B[0]];
 
-    newCube.U[2] = cube.F[2];
-    newCube.U[5] = cube.F[5];
-    newCube.U[8] = cube.F[8];
+    newCube.U[2] = tempF[0];
+    newCube.U[5] = tempF[1];
+    newCube.U[8] = tempF[2];
 
-    newCube.F[2] = cube.D[2];
-    newCube.F[5] = cube.D[5];
-    newCube.F[8] = cube.D[8];
+    newCube.F[2] = tempD[0];
+    newCube.F[5] = tempD[1];
+    newCube.F[8] = tempD[2];
 
-    newCube.D[2] = cube.B[6];
-    newCube.D[5] = cube.B[3];
-    newCube.D[8] = cube.B[0];
+    newCube.D[2] = tempB[0];
+    newCube.D[5] = tempB[1];
+    newCube.D[8] = tempB[2];
 
     newCube.B[6] = tempU[2];
     newCube.B[3] = tempU[1];
@@ -51,23 +59,27 @@ const rotateRightInverse = (cube) => {
     const tempD = [cube.D[2], cube.D[5], cube.D[8]];
     const tempB = [cube.B[6], cube.B[3], cube.B[0]];
 
-    newCube.U[2] = cube.B[6];
-    newCube.U[5] = cube.B[3];
-    newCube.U[8] = cube.B[0];
+    newCube.U[2] = tempB[0];
+    newCube.U[5] = tempB[1];
+    newCube.U[8] = tempB[2];
 
-    newCube.F[2] = cube.U[2];
-    newCube.F[5] = cube.U[5];
-    newCube.F[8] = cube.U[8];
+    newCube.F[2] = tempU[0];
+    newCube.F[5] = tempU[1];
+    newCube.F[8] = tempU[2];
 
-    newCube.D[2] = cube.F[2];
-    newCube.D[5] = cube.F[5];
-    newCube.D[8] = cube.F[8];
+    newCube.D[2] = tempF[0];
+    newCube.D[5] = tempF[1];
+    newCube.D[8] = tempF[2];
 
     newCube.B[6] = tempD[2];
     newCube.B[3] = tempD[1];
     newCube.B[0] = tempD[0];
 
     return newCube;
+};
+
+const rotateRight180 = (cube) => {
+    return rotateRight(rotateRight(cube));
 };
 
 const rotateUp = (cube) => {
@@ -126,6 +138,10 @@ const rotateUpInverse = (cube) => {
     return newCube;
 };
 
+const rotateUp180 = (cube) => {
+    return rotateUp(rotateUp(cube));
+};
+
 const rotateFront = (cube) => {
     const newCube = { ...cube };
     newCube.F = rotateFaceClockwise(cube.F);
@@ -180,6 +196,10 @@ const rotateFrontInverse = (cube) => {
     newCube.L[8] = tempU[6];
 
     return newCube;
+};
+
+const rotateFront180 = (cube) => {
+    return rotateFront(rotateFront(cube));
 };
 
 const rotateLeft = (cube) => {
@@ -238,6 +258,10 @@ const rotateLeftInverse = (cube) => {
     return newCube;
 };
 
+const rotateLeft180 = (cube) => {
+    return rotateLeft(rotateLeft(cube));
+};
+
 const rotateDown = (cube) => {
     const newCube = { ...cube };
     newCube.D = rotateFaceClockwise(cube.D);
@@ -292,6 +316,10 @@ const rotateDownInverse = (cube) => {
     newCube.L[8] = tempF[8];
 
     return newCube;
+};
+
+const rotateDown180 = (cube) => {
+    return rotateDown(rotateDown(cube));
 };
 
 const rotateBack = (cube) => {
@@ -350,17 +378,210 @@ const rotateBackInverse = (cube) => {
     return newCube;
 };
 
+const rotateBack180 = (cube) => {
+    return rotateBack(rotateBack(cube));
+};
+
+const rotateMiddle = (cube) => {
+    const newCube = { ...cube };
+
+    const tempU = [cube.U[1], cube.U[4], cube.U[7]];
+    const tempF = [cube.F[1], cube.F[4], cube.F[7]];
+    const tempD = [cube.D[1], cube.D[4], cube.D[7]];
+    const tempB = [cube.B[7], cube.B[4], cube.B[1]];
+
+    newCube.U[1] = tempB[0];
+    newCube.U[4] = tempB[1];
+    newCube.U[7] = tempB[2];
+
+    newCube.F[1] = tempU[0];
+    newCube.F[4] = tempU[1];
+    newCube.F[7] = tempU[2];
+
+    newCube.D[1] = tempF[0];
+    newCube.D[4] = tempF[1];
+    newCube.D[7] = tempF[2];
+
+    newCube.B[7] = tempD[0];
+    newCube.B[4] = tempD[1];
+    newCube.B[1] = tempD[2];
+
+    return newCube;
+};
+
+const rotateMiddleInverse = (cube) => {
+    const newCube = { ...cube };
+
+    const tempU = [cube.U[1], cube.U[4], cube.U[7]];
+    const tempF = [cube.F[1], cube.F[4], cube.F[7]];
+    const tempD = [cube.D[1], cube.D[4], cube.D[7]];
+    const tempB = [cube.B[7], cube.B[4], cube.B[1]];
+
+    newCube.U[1] = tempF[0];
+    newCube.U[4] = tempF[1];
+    newCube.U[7] = tempF[2];
+
+    newCube.F[1] = tempD[0];
+    newCube.F[4] = tempD[1];
+    newCube.F[7] = tempD[2];
+
+    newCube.D[1] = tempB[0];
+    newCube.D[4] = tempB[1];
+    newCube.D[7] = tempB[2];
+
+    newCube.B[7] = tempU[0];
+    newCube.B[4] = tempU[1];
+    newCube.B[1] = tempU[2];
+
+    return newCube;
+};
+
+const rotateMiddle180 = (cube) => {
+    return rotateMiddle(rotateMiddle(cube));
+};
+
+const rotateEquatorial = (cube) => {
+    const newCube = { ...cube };
+
+    const tempF = [cube.F[3], cube.F[4], cube.F[5]];
+    const tempR = [cube.R[3], cube.R[4], cube.R[5]];
+    const tempB = [cube.B[3], cube.B[4], cube.B[5]];
+    const tempL = [cube.L[3], cube.L[4], cube.L[5]];
+
+    newCube.F[3] = tempL[3];
+    newCube.F[4] = tempL[4];
+    newCube.F[5] = tempL[5];
+
+    newCube.R[3] = tempF[3];
+    newCube.R[4] = tempF[4];
+    newCube.R[5] = tempF[5];
+
+    newCube.B[3] = tempR[3];
+    newCube.B[4] = tempR[4];
+    newCube.B[5] = tempR[5];
+
+    newCube.L[3] = tempB[3];
+    newCube.L[4] = tempB[4];
+    newCube.L[5] = tempB[5];
+
+    return newCube;
+};
+
+const rotateEquatorialInverse = (cube) => {
+    const newCube = { ...cube };
+
+    const tempF = [cube.F[3], cube.F[4], cube.F[5]];
+    const tempR = [cube.R[3], cube.R[4], cube.R[5]];
+    const tempB = [cube.B[3], cube.B[4], cube.B[5]];
+    const tempL = [cube.L[3], cube.L[4], cube.L[5]];
+
+    newCube.F[3] = tempR[3];
+    newCube.F[4] = tempR[4];
+    newCube.F[5] = tempR[5];
+
+    newCube.R[3] = tempB[3];
+    newCube.R[4] = tempB[4];
+    newCube.R[5] = tempB[5];
+
+    newCube.B[3] = tempL[3];
+    newCube.B[4] = tempL[4];
+    newCube.B[5] = tempL[5];
+
+    newCube.L[3] = tempF[3];
+    newCube.L[4] = tempF[4];
+    newCube.L[5] = tempF[5];
+
+    return newCube;
+};
+
+const rotateEquatorial180 = (cube) => {
+    return rotateEquatorial(rotateEquatorial(cube));
+};
+
+const rotateStanding = (cube) => {
+    const newCube = { ...cube };
+
+    const tempU = [cube.U[1], cube.U[4], cube.U[7]];
+    const tempF = [cube.F[1], cube.F[4], cube.F[7]];
+    const tempD = [cube.D[1], cube.D[4], cube.D[7]];
+    const tempB = [cube.B[7], cube.B[4], cube.B[1]];
+
+    newCube.U[1] = tempF[1];
+    newCube.U[4] = tempF[4];
+    newCube.U[7] = tempF[7];
+
+    newCube.F[1] = tempD[1];
+    newCube.F[4] = tempD[4];
+    newCube.F[7] = tempD[7];
+
+    newCube.D[1] = tempB[1];
+    newCube.D[4] = tempB[4];
+    newCube.D[7] = tempB[7];
+
+    newCube.B[7] = tempU[7];
+    newCube.B[4] = tempU[4];
+    newCube.B[1] = tempU[1];
+
+    return newCube;
+};
+
+const rotateStandingInverse = (cube) => {
+    const newCube = { ...cube };
+
+    const tempU = [cube.U[1], cube.U[4], cube.U[7]];
+    const tempF = [cube.F[1], cube.F[4], cube.F[7]];
+    const tempD = [cube.D[1], cube.D[4], cube.D[7]];
+    const tempB = [cube.B[7], cube.B[4], cube.B[1]];
+
+    newCube.U[1] = tempB[7];
+    newCube.U[4] = tempB[4];
+    newCube.U[7] = tempB[1];
+
+    newCube.F[1] = tempU[1];
+    newCube.F[4] = tempU[4];
+    newCube.F[7] = tempU[7];
+
+    newCube.D[1] = tempF[1];
+    newCube.D[4] = tempF[4];
+    newCube.D[7] = tempF[7];
+
+    newCube.B[7] = tempD[7];
+    newCube.B[4] = tempD[4];
+    newCube.B[1] = tempD[1];
+
+    return newCube;
+};
+
+const rotateStanding180 = (cube) => {
+    return rotateStanding(rotateStanding(cube));
+};
+
 export {
     rotateRight,
     rotateRightInverse,
+    rotateRight180,
     rotateUp,
     rotateUpInverse,
+    rotateUp180,
     rotateFront,
     rotateFrontInverse,
+    rotateFront180,
     rotateLeft,
     rotateLeftInverse,
+    rotateLeft180,
     rotateDown,
     rotateDownInverse,
+    rotateDown180,
     rotateBack,
     rotateBackInverse,
+    rotateBack180,
+    rotateMiddle,
+    rotateMiddleInverse,
+    rotateMiddle180,
+    rotateEquatorial,
+    rotateEquatorialInverse,
+    rotateEquatorial180,
+    rotateStanding,
+    rotateStandingInverse,
+    rotateStanding180,
 };
