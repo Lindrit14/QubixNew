@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { View, ScrollView, Button, StyleSheet, Text, TouchableOpacity, Alert } from 'react-native';
+import { View, ScrollView, Button, StyleSheet, Text, TouchableOpacity, Alert, Modal, ActivityIndicator } from 'react-native';
 import CubeFace from './CubeFace';
 import { useNavigation } from '@react-navigation/native';
 import { signOut } from 'firebase/auth';
 import { auth } from './firebaseConfig';
+import solver from 'rubiks-cube-solver'; // Ensure you have this package installed
 
 const initialFaceState = new Array(9).fill('white');
 
@@ -21,6 +22,7 @@ const CubeInputScreen = () => {
   });
   const [selectedColor, setSelectedColor] = useState('white');
   const [isSolvable, setIsSolvable] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     checkSolvability();
@@ -41,6 +43,7 @@ const CubeInputScreen = () => {
       ...prevState,
       [face]: newFaceState
     }));
+    console.log('Updated Cube State:', JSON.stringify(cubeState, null, 2));
   };
 
   const checkSolvability = () => {
@@ -54,15 +57,48 @@ const CubeInputScreen = () => {
   };
 
   const resetCube = () => {
-    setCubeState({
+    const newState = {
       U: [...initialFaceState],
       L: [...initialFaceState],
       F: [...initialFaceState],
       R: [...initialFaceState],
       B: [...initialFaceState],
       D: [...initialFaceState]
-    });
+    };
+    setCubeState(newState);
+    console.log('Reset Cube State:', JSON.stringify(newState, null, 2));
     setIsSolvable(false);
+  };
+
+  const handleSolve = async () => {
+    setLoading(true);
+    try {
+      const cubeString = [
+        cubeState.F.join(''),
+        cubeState.R.join(''),
+        cubeState.U.join(''),
+        cubeState.D.join(''),
+        cubeState.L.join(''),
+        cubeState.B.join('')
+      ].join('');
+
+      const filteredCubeString = cubeString.replace(/green|orange|white|red|blue|yellow/g, matched => ({
+        green: 'f',
+        orange: 'l',
+        white: 'u',
+        red: 'r',
+        blue: 'b',
+        yellow: 'd'
+      }[matched]));
+
+      const moves = solver(filteredCubeString); // This will throw an error if the cube is unsolvable
+
+      setLoading(false);
+      navigation.navigate('Solution', { cubeState });
+    } catch (error) {
+      setLoading(false);
+      Alert.alert("Unsolvable Configuration", "Please adjust your cube configuration before solving.");
+    }
   };
 
   return (
@@ -72,7 +108,7 @@ const CubeInputScreen = () => {
         {colors.map(color => (
           <TouchableOpacity
             key={color}
-            style={[styles.colorButton, { backgroundColor: color }]}
+            style={[styles.colorButton, { backgroundColor: color, borderWidth: selectedColor === color ? 2 : 0 }]}
             onPress={() => setSelectedColor(color)}
           />
         ))}
@@ -109,43 +145,46 @@ const CubeInputScreen = () => {
         </View>
       </View>
       <View style={styles.buttonContainer}>
-        <Button
-          title="Solve Cube"
-          onPress={() => isSolvable ? navigation.navigate('Solution', { cubeState }) : Alert.alert("Unsolvable Configuration", "Please adjust your cube configuration before solving.")}
-          color={isSolvable ? 'blue' : 'gray'}
+        <TouchableOpacity
+          style={[styles.actionButton, { backgroundColor: isSolvable ? 'blue' : 'gray' }]}
+          onPress={() => isSolvable ? handleSolve() : Alert.alert("Unsolvable Configuration", "Please adjust your cube configuration before solving.")}
           disabled={!isSolvable}
-        />
-        <Button
-          title="Input Info"
-          onPress={() => navigation.navigate('InputInfo')}
-          color="blue"
-        />
-        <Button
-          title="Logout"
-          onPress={handleLogout}
-          color='red'
-        />
-        <Button
-          title="Reset Cube"
-          onPress={resetCube}
-          color="red"
-        />
+        >
+          <Text style={styles.buttonText}>Solve Cube</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={[styles.actionButton, { backgroundColor: 'blue' }]} onPress={() => navigation.navigate('InputInfo')}>
+          <Text style={styles.buttonText}>Input Info</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={[styles.actionButton, { backgroundColor: 'red' }]} onPress={handleLogout}>
+          <Text style={styles.buttonText}>Logout</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={[styles.actionButton, { backgroundColor: 'red' }]} onPress={resetCube}>
+          <Text style={styles.buttonText}>Reset Cube</Text>
+        </TouchableOpacity>
       </View>
+      <Modal visible={loading} transparent>
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#00ff00" />
+          <Text style={styles.loadingText}>Checking if solvable...</Text>
+        </View>
+      </Modal>
     </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: "black",
-    padding: 10,
+    flex: 1,
+    backgroundColor: "#282c34",
     alignItems: 'center',
-    justifyContent: 'center'
+    justifyContent: 'center',
+    padding: 20,
   },
   title: {
     color: 'white',
     fontSize: 24,
-    marginBottom: 20
+    marginBottom: 20,
+    fontWeight: 'bold'
   },
   colorContainer: {
     flexDirection: 'row',
@@ -157,6 +196,7 @@ const styles = StyleSheet.create({
     height: 40,
     margin: 5,
     borderRadius: 20,
+    borderColor: 'white',
   },
   selectedColor: {
     color: 'white',
@@ -178,14 +218,34 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 5
   },
-  cube3DContainer: {
-    height: 300,
-    width: 300,
-    marginBottom: 20,
-  },
   buttonContainer: {
     marginTop: 20,
+    width: '100%',
+    alignItems: 'center'
   },
+  actionButton: {
+    width: '80%',
+    padding: 15,
+    margin: 5,
+    borderRadius: 10,
+    alignItems: 'center'
+  },
+  buttonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold'
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  loadingText: {
+    color: 'white',
+    marginTop: 10,
+    fontSize: 18,
+  }
 });
 
 export default CubeInputScreen;

@@ -39,6 +39,7 @@ const SolutionScreen = ({ route, navigation }) => {
   const [solutionSteps, setSolutionSteps] = useState([]);
   const [currentCubeState, setCurrentCubeState] = useState(cubeState);
   const [cubeHistory, setCubeHistory] = useState([cubeState]);
+  const [originalCubeState, setOriginalCubeState] = useState(cubeState);
 
   const colorToChar = {
     green: 'f',
@@ -94,7 +95,7 @@ const SolutionScreen = ({ route, navigation }) => {
       return;
     }
 
-    if (filteredCubeString === 'fffffffffllllllllluuuuuuuuudddddddddrrrrrrrrrbbbbbbbbb') {
+    if (filteredCubeString === 'fffffffffrrrrrrrrruuuuuuuuudddddddddlllllllllbbbbbbbbb') {
       console.log('The cube is already solved.');
       setSolutionSteps(['Cube is already solved.']);
       return;
@@ -116,6 +117,40 @@ const SolutionScreen = ({ route, navigation }) => {
     });
   };
 
+  const inverseMoves = {
+    'R': 'Rprime',
+    'Rprime': 'R',
+    'R2': 'R2',
+    'U': 'Uprime',
+    'Uprime': 'U',
+    'U2': 'U2',
+    'F': 'Fprime',
+    'Fprime': 'F',
+    'F2': 'F2',
+    'L': 'Lprime',
+    'Lprime': 'L',
+    'L2': 'L2',
+    'D': 'Dprime',
+    'Dprime': 'D',
+    'D2': 'D2',
+    'B': 'Bprime',
+    'Bprime': 'B',
+    'B2': 'B2',
+    'M': 'Mprime',
+    'Mprime': 'M',
+    'M2': 'M2',
+    'E': 'Eprime',
+    'Eprime': 'E',
+    'E2': 'E2',
+    'S': 'Sprime',
+    'Sprime': 'S',
+    'S2': 'S2'
+  };
+
+  const logCubeState = (state, step) => {
+    console.log(`Cube State after ${step}:`, JSON.stringify(state, null, 2));
+  };
+
   const nextStep = () => {
     if (currentStep < solutionSteps.length) {
       const step = solutionSteps[currentStep];
@@ -126,13 +161,15 @@ const SolutionScreen = ({ route, navigation }) => {
 
   const prevStep = () => {
     if (currentStep > 0) {
+      const prevStep = solutionSteps[currentStep - 1];
+      handleStep(inverseMoves[prevStep]);
       setCurrentStep(currentStep - 1);
-      setCurrentCubeState(cubeHistory[currentStep - 1]);
     }
   };
 
   const handleStep = (step) => {
     let newState;
+    console.log('Executing Step:', step);
     switch (step) {
       case 'R':
         newState = rotateRight(currentCubeState);
@@ -210,14 +247,12 @@ const SolutionScreen = ({ route, navigation }) => {
         console.log('Unknown step:', step);
         return;
     }
+    logCubeState(newState, step);
     setCurrentCubeState(newState);
     setCubeHistory([...cubeHistory, newState]);
   };
 
   const resetCube = () => {
-    setCurrentCubeState(cubeState);
-    setCurrentStep(0);
-    setCubeHistory([cubeState]);
     setRotation([0, 0, 0]);
   };
 
@@ -244,7 +279,7 @@ const SolutionScreen = ({ route, navigation }) => {
       <View style={styles.stepButtonContainer}>
         <Button title="Next Step" onPress={nextStep} />
         <Button title="Step Back" onPress={prevStep} />
-        <Button title="Reset" onPress={resetCube} color="red" />
+        <Button title="Reset Position" onPress={resetCube} color="red" />
       </View>
       <Text style={styles.stepText}>Current Step: {solutionSteps[currentStep]}</Text>
       <Text style={styles.solutionText}>Solution Moves: {solutionSteps.join(' ')}</Text>
@@ -258,6 +293,7 @@ const SolutionScreen = ({ route, navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "#282c34",
     alignItems: 'center',
     justifyContent: 'center',
     padding: 20,
@@ -266,6 +302,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 20,
+    color: 'white'
   },
   cube3DContainer: {
     height: 300,
@@ -290,10 +327,12 @@ const styles = StyleSheet.create({
   stepText: {
     fontSize: 18,
     marginTop: 10,
+    color: 'white'
   },
   solutionText: {
     fontSize: 18,
     marginTop: 10,
+    color: 'white'
   },
   backButton: {
     marginTop: 20,
