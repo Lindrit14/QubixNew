@@ -5,6 +5,7 @@ import { useNavigation } from '@react-navigation/native';
 import { signOut } from 'firebase/auth';
 import { auth } from './firebaseConfig';
 import solver from 'rubiks-cube-solver';
+import { saveSolve } from './solvingHistory';
 
 const initialFaceState = new Array(9).fill('white');
 
@@ -94,6 +95,10 @@ const CubeInputScreen = () => {
       const moves = solver(filteredCubeString); // This will throw an error if the cube is unsolvable
 
       setLoading(false);
+      await saveSolve({
+        date: new Date().toISOString(),
+        steps: moves.split(' '),
+      });
       navigation.navigate('Solution', { cubeState });
     } catch (error) {
       setLoading(false);
@@ -157,6 +162,9 @@ const CubeInputScreen = () => {
         </TouchableOpacity>
         <TouchableOpacity style={[styles.actionButton, { backgroundColor: 'orange' }]} onPress={resetCube}>
           <Text style={styles.buttonText}>Reset Cube</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={[styles.actionButton, { backgroundColor: 'green' }]} onPress={() => navigation.navigate('History')}>
+          <Text style={styles.buttonText}>View Solving History</Text>
         </TouchableOpacity>
         <TouchableOpacity style={[styles.actionButton, { backgroundColor: 'red' }]} onPress={handleLogout}>
           <Text style={styles.buttonText}>Logout</Text>

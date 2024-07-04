@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Button, FlatList, Alert } from 'react-native';
 import RubiksCube3D from './RubiksCube3D';
 import solver from 'rubiks-cube-solver';
+import { saveSolve, getSolvingHistory } from './solvingHistory';
 import {
   rotateRight,
   rotateRightInverse,
@@ -60,6 +61,7 @@ const SolutionScreen = ({ route, navigation }) => {
     }, 1000);
     return () => clearInterval(interval);
   }, [isSolved, startTime]);
+  const [solvingHistory, setSolvingHistory] = useState([]);
 
   const colorToChar = {
     green: 'f',
@@ -143,6 +145,16 @@ const SolutionScreen = ({ route, navigation }) => {
     }
   }, [cubeState]);
 
+  useEffect(() => {
+    const fetchSolvingHistory = async () => {
+      const history = await getSolvingHistory();
+      console.log('Solving history on mount:', history);
+      setSolvingHistory(history);
+    };
+
+    fetchSolvingHistory();
+  }, []);
+
   const rotateCube = (axis, value) => {
     setRotation(prevRotation => {
       const newRotation = [...prevRotation];
@@ -185,7 +197,7 @@ const SolutionScreen = ({ route, navigation }) => {
     console.log(`Cube State after ${step}:`, JSON.stringify(state, null, 2));
   };
 
-  const nextStep = () => {
+  const nextStep = async () => {
     if (currentStep < solutionSteps.length) {
       const step = solutionSteps[currentStep];
       const stepStart = stepStartTime || new Date();
@@ -210,6 +222,15 @@ const SolutionScreen = ({ route, navigation }) => {
         setIsSolved(true);
         Alert.alert("Cube Solved!", `Congratulations! You have solved the cube in ${overallTime.toFixed(2)} seconds.`);
       }
+    } if (currentStep === solutionSteps.length) {
+      const solve = {
+        date: new Date().toISOString(),
+        steps: solutionSteps,
+      };
+      console.log('Saving current solve:', solve);
+      await saveSolve(solve);
+      const history = await getSolvingHistory();
+      setSolvingHistory(history);
     }
   };
 
@@ -418,6 +439,18 @@ const styles = StyleSheet.create({
     fontSize: 18,
     marginTop: 10,
     color: 'white'
+  },
+  historyTitle: {
+    fontSize: 18,
+    marginTop: 20,
+    color: 'white',
+    fontWeight: 'bold',
+  },
+  backButton: {
+    marginTop: 20,
+    backgroundColor: 'lightblue',
+    padding: 10,
+    borderRadius: 5,
   },
 });
 
