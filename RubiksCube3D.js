@@ -47,7 +47,11 @@ const RubiksCube3D = ({ cubeState, rotation }) => {
                                 (index % 3) - 1,
                                 1 - Math.floor(index / 3),
                                 0
-                            ]} />
+                            ]}>
+                                <lineSegments geometry={new THREE.EdgesGeometry(faces.geometry)}>
+                                    <lineBasicMaterial attach="material" color="black" />
+                                </lineSegments>
+                            </mesh>
                         ))}
                     </group>
                 ))}
