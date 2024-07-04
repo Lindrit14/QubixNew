@@ -166,9 +166,6 @@ const CubeInputScreen = () => {
         <TouchableOpacity style={[styles.actionButton, { backgroundColor: 'red' }]} onPress={handleLogout}>
           <Text style={styles.buttonText}>Logout</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={[styles.actionButton, { backgroundColor: 'red' }]} onPress={resetCube}>
-          <Text style={styles.buttonText}>Reset Cube</Text>
-        </TouchableOpacity>
       </View>
       <Modal visible={loading} transparent>
         <View style={styles.loadingContainer}>
