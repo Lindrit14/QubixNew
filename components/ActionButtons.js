@@ -26,13 +26,13 @@ const ActionButtons = ({ isSolvable, handleSolve, resetCube, handleLogout, navig
 
 const styles = StyleSheet.create({
     buttonContainer: {
-        marginTop: 20,
+        marginTop: 10,
         width: '100%',
         alignItems: 'center'
     },
     actionButton: {
-        width: '80%',
-        padding: 15,
+        width: '70%',
+        padding: 10,
         margin: 5,
         borderRadius: 10,
         alignItems: 'center'

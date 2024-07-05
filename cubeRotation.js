@@ -564,6 +564,7 @@ export {
     rotateUpInverse,
     rotateUp180,
     rotateFront,
+    rotateFace180,
     rotateFrontInverse,
     rotateFront180,
     rotateLeft,

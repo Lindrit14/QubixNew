@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, ScrollView, StyleSheet, Text, Alert, Modal, ActivityIndicator } from 'react-native';
+import { View, ScrollView, StyleSheet, Text, Alert, Modal, ActivityIndicator, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { signOut } from 'firebase/auth';
 import { auth } from './firebaseConfig';
@@ -7,6 +7,7 @@ import solver from 'rubiks-cube-solver';
 import ColorPicker from './components/ColorPicker';
 import CubeFaces from './components/CubeFaces';
 import ActionButtons from './components/ActionButtons';
+import { Ionicons } from '@expo/vector-icons';
 
 const initialFaceState = new Array(9).fill('white');
 
@@ -23,6 +24,7 @@ const CubeInputScreen = () => {
   const [selectedColor, setSelectedColor] = useState('white');
   const [isSolvable, setIsSolvable] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [algorithm, setAlgorithm] = useState('CFOP');
 
   useEffect(() => {
     checkSolvability();
@@ -91,8 +93,17 @@ const CubeInputScreen = () => {
         yellow: 'd'
       }[matched]));
 
-      const moves = solver(filteredCubeString); // This will throw an error if the cube is unsolvable
-
+      /*
+      let moves;
+      if (algorithm === 'CFOP') {
+        moves = solver.solveWithCFOP(filteredCubeString); // Use CFOP
+      } else if (algorithm === 'Roux') {
+        moves = solver.solveWithRoux(filteredCubeString); // Use Roux
+      } else {
+        throw new Error('Unsupported algorithm selected');
+      }
+      */
+      const moves = solver(filteredCubeString);
       setLoading(false);
       navigation.navigate('Solution', { cubeState });
     } catch (error) {
@@ -102,23 +113,28 @@ const CubeInputScreen = () => {
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <ColorPicker selectedColor={selectedColor} setSelectedColor={setSelectedColor} />
-      <CubeFaces cubeState={cubeState} handleColorChange={handleColorChange} />
-      <ActionButtons
-        isSolvable={isSolvable}
-        handleSolve={handleSolve}
-        resetCube={resetCube}
-        handleLogout={handleLogout}
-        navigation={navigation}
-      />
-      <Modal visible={loading} transparent>
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#00ff00" />
-          <Text style={styles.loadingText}>Checking if solvable...</Text>
-        </View>
-      </Modal>
-    </ScrollView>
+    <View style={{ flex: 1 }}>
+      <ScrollView contentContainerStyle={styles.container}>
+        <ColorPicker selectedColor={selectedColor} setSelectedColor={setSelectedColor} />
+        <CubeFaces cubeState={cubeState} handleColorChange={handleColorChange} />
+        <ActionButtons
+          isSolvable={isSolvable}
+          handleSolve={handleSolve}
+          resetCube={resetCube}
+          handleLogout={handleLogout}
+          navigation={navigation}
+        />
+        <Modal visible={loading} transparent>
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color="#00ff00" />
+            <Text style={styles.loadingText}>Checking if solvable...</Text>
+          </View>
+        </Modal>
+      </ScrollView>
+      <TouchableOpacity style={styles.settingsIcon} onPress={() => navigation.navigate('Settings')}>
+        <Ionicons name="settings-outline" size={24} color="white" />
+      </TouchableOpacity>
+    </View>
   );
 };
 
@@ -140,7 +156,12 @@ const styles = StyleSheet.create({
     color: 'white',
     marginTop: 10,
     fontSize: 18,
-  }
+  },
+  settingsIcon: {
+    position: 'absolute',
+    top: 40,
+    right: 20,
+  },
 });
 
 export default CubeInputScreen;

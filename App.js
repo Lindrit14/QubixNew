@@ -10,6 +10,8 @@ import SolutionScreen from './SolutionScreen';
 import InputInfoScreen from './InputInfoScreen';
 import AnalysisScreen from './AnalysisScreen';
 import HistoryScreen from './HistoryScreen';
+import SettingsScreen from './SettingsScreen';
+import AlgorithmScreen from './AlgorithmScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -34,6 +36,8 @@ export default function App() {
             <Stack.Screen name="InputInfo" component={InputInfoScreen} />
             <Stack.Screen name="Analysis" component={AnalysisScreen} />
             <Stack.Screen name="History" component={HistoryScreen} />
+            <Stack.Screen name="Settings" component={SettingsScreen} />
+            <Stack.Screen name="Algorithm" component={AlgorithmScreen} />
           </>
         ) : (
           <>
