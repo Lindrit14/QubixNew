@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Button, FlatList, Alert } from 'react-native';
+import { View, Text, StyleSheet, FlatList, Alert } from 'react-native';
 import RubiksCube3D from './RubiksCube3D';
 import solver from 'rubiks-cube-solver';
 import { saveSolve, getSolvingHistory } from './solvingHistory';
+import CubeTimer from './components/CubeTimer';
+import CubeControls from './components/CubeControls';
+import StepControls from './components/StepControls';
 import {
   rotateRight,
   rotateRightInverse,
@@ -52,7 +55,6 @@ const SolutionScreen = ({ route, navigation }) => {
     setStepStartTime(initialTime);
   }, []);
 
-
   useEffect(() => {
     const interval = setInterval(() => {
       if (!isSolved && startTime) {
@@ -61,7 +63,6 @@ const SolutionScreen = ({ route, navigation }) => {
     }, 1000);
     return () => clearInterval(interval);
   }, [isSolved, startTime]);
-  const [solvingHistory, setSolvingHistory] = useState([]);
 
   const colorToChar = {
     green: 'f',
@@ -145,16 +146,6 @@ const SolutionScreen = ({ route, navigation }) => {
     }
   }, [cubeState]);
 
-  useEffect(() => {
-    const fetchSolvingHistory = async () => {
-      const history = await getSolvingHistory();
-      console.log('Solving history on mount:', history);
-      setSolvingHistory(history);
-    };
-
-    fetchSolvingHistory();
-  }, []);
-
   const rotateCube = (axis, value) => {
     setRotation(prevRotation => {
       const newRotation = [...prevRotation];
@@ -234,7 +225,6 @@ const SolutionScreen = ({ route, navigation }) => {
     }
   };
 
-
   const prevStep = () => {
     if (currentStep > 0) {
       const prevStep = solutionSteps[currentStep - 1];
@@ -243,7 +233,6 @@ const SolutionScreen = ({ route, navigation }) => {
       setStepTimes(prevStepTimes => prevStepTimes.slice(0, -1));
     }
   };
-
 
   const handleStep = (step) => {
     let newState;
@@ -344,30 +333,17 @@ const SolutionScreen = ({ route, navigation }) => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Solution Screen</Text>
-      <Text style={styles.timerText}>Time: {overallTime.toFixed(2)}s</Text>
+      <CubeTimer overallTime={overallTime} />
       <View style={styles.cube3DContainer}>
         <RubiksCube3D cubeState={currentCubeState} rotation={rotation} />
       </View>
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.button} onPress={() => rotateCube(0, Math.PI / 6)}>
-          <Text>Up</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.button} onPress={() => rotateCube(0, -Math.PI / 6)}>
-          <Text>Down</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.button} onPress={() => rotateCube(1, Math.PI / 6)}>
-          <Text>Left</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.button} onPress={() => rotateCube(1, -Math.PI / 6)}>
-          <Text>Right</Text>
-        </TouchableOpacity>
-      </View>
-      <View style={styles.stepButtonContainer}>
-        <Button title="Next Step" onPress={nextStep} />
-        <Button title="Step Back" onPress={prevStep} />
-        <Button title="Reset Position" onPress={resetCube} color="red" />
-        <Button title="Show Analysis" onPress={() => navigation.navigate('Analysis', { stepTimes, totalTimeTaken: overallTime.toFixed(2) })} />
-      </View>
+      <CubeControls rotateCube={rotateCube} />
+      <StepControls
+        nextStep={nextStep}
+        prevStep={prevStep}
+        resetCube={resetCube}
+        showAnalysis={() => navigation.navigate('Analysis', { stepTimes, totalTimeTaken: overallTime.toFixed(2) })}
+      />
       {!isSolved && (
         <FlatList
           data={solutionSteps}
@@ -396,31 +372,9 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     color: 'white'
   },
-  timerText: {
-    fontSize: 14,
-    color: 'white',
-    position: 'absolute',
-    top: 10,
-    right: 10,
-  },
   cube3DContainer: {
     height: 300,
     width: 300,
-    marginBottom: 20,
-  },
-  buttonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    width: '100%',
-    marginBottom: 20,
-  },
-  button: {
-    padding: 10,
-    backgroundColor: 'lightblue',
-    opacity: 0.8,
-    borderRadius: 5,
-  },
-  stepButtonContainer: {
     marginBottom: 20,
   },
   stepText: {
@@ -439,18 +393,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     marginTop: 10,
     color: 'white'
-  },
-  historyTitle: {
-    fontSize: 18,
-    marginTop: 20,
-    color: 'white',
-    fontWeight: 'bold',
-  },
-  backButton: {
-    marginTop: 20,
-    backgroundColor: 'lightblue',
-    padding: 10,
-    borderRadius: 5,
   },
 });
 
