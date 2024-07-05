@@ -8,6 +8,9 @@ import ColorPicker from './components/ColorPicker';
 import CubeFaces from './components/CubeFaces';
 import ActionButtons from './components/ActionButtons';
 import { Ionicons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import cubeSolver from 'cube-solver';
+
 
 const initialFaceState = new Array(9).fill('white');
 
@@ -28,6 +31,13 @@ const CubeInputScreen = () => {
 
   useEffect(() => {
     checkSolvability();
+    const getAlgorithm = async () => {
+      const savedAlgorithm = await AsyncStorage.getItem('solvingAlgorithm');
+      if (savedAlgorithm) {
+        setAlgorithm(savedAlgorithm);
+      }
+    };
+    getAlgorithm();
   }, [cubeState]);
 
   const handleLogout = () => {
@@ -46,6 +56,7 @@ const CubeInputScreen = () => {
       [face]: newFaceState
     }));
     console.log('Updated Cube State:', JSON.stringify(cubeState, null, 2));
+    console.log("Algorithm:", algorithm)
   };
 
   const checkSolvability = () => {
@@ -93,21 +104,25 @@ const CubeInputScreen = () => {
         yellow: 'd'
       }[matched]));
 
-      /*
+
+
+
       let moves;
       if (algorithm === 'CFOP') {
-        moves = solver.solveWithCFOP(filteredCubeString); // Use CFOP
-      } else if (algorithm === 'Roux') {
-        moves = solver.solveWithRoux(filteredCubeString); // Use Roux
+        moves = solver(filteredCubeString); // Use CFOP
+      } else if (algorithm === 'Kociemba') {
+        moves = cubeSolver.solve(filteredCubeString, 'kociemba'); // Use Kociemba
+        console.log('Kociemba Moves:', moves);
       } else {
         throw new Error('Unsupported algorithm selected');
       }
-      */
-      const moves = solver(filteredCubeString);
+
+
       setLoading(false);
       navigation.navigate('Solution', { cubeState });
     } catch (error) {
       setLoading(false);
+      console.error(error);
       Alert.alert("Unsolvable Configuration", "Please adjust your cube configuration before solving.");
     }
   };
@@ -159,7 +174,7 @@ const styles = StyleSheet.create({
   },
   settingsIcon: {
     position: 'absolute',
-    top: 40,
+    top: 20,
     right: 20,
   },
 });

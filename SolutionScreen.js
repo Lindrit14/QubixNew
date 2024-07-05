@@ -37,7 +37,7 @@ import {
 } from './cubeRotation';
 
 const SolutionScreen = ({ route, navigation }) => {
-  const { cubeState } = route.params;
+  const { cubeState, solutionAlgorithm } = route.params;
   const [rotation, setRotation] = useState([0, 0, 0]);
   const [currentStep, setCurrentStep] = useState(0);
   const [solutionSteps, setSolutionSteps] = useState([]);
@@ -48,6 +48,16 @@ const SolutionScreen = ({ route, navigation }) => {
   const [overallTime, setOverallTime] = useState(0);
   const [isSolved, setIsSolved] = useState(false);
   const [stepStartTime, setStepStartTime] = useState(null);
+  const [solvingHistory, setSolvingHistory] = useState([]);
+
+  useEffect(() => {
+    const fetchSolvingHistory = async () => {
+      const history = await getSolvingHistory();
+      setSolvingHistory(history);
+    };
+
+    fetchSolvingHistory();
+  }, []);
 
   useEffect(() => {
     const initialTime = new Date();
@@ -207,18 +217,19 @@ const SolutionScreen = ({ route, navigation }) => {
       if (checkIfSolved(currentCubeState)) {
         setIsSolved(true);
         Alert.alert("Cube Solved!", `Congratulations! You have solved the cube in ${overallTime.toFixed(2)} seconds.`);
+        const solve = {
+          date: new Date().toISOString(),
+          steps: solutionSteps,
+        };
+        await saveSolve(solve);
+        const history = await getSolvingHistory();
+        setSolvingHistory(history);
       }
-    } else {
-      if (!isSolved) {
-        setIsSolved(true);
-        Alert.alert("Cube Solved!", `Congratulations! You have solved the cube in ${overallTime.toFixed(2)} seconds.`);
-      }
-    } if (currentStep === solutionSteps.length) {
+    } else if (currentStep === solutionSteps.length) {
       const solve = {
         date: new Date().toISOString(),
         steps: solutionSteps,
       };
-      console.log('Saving current solve:', solve);
       await saveSolve(solve);
       const history = await getSolvingHistory();
       setSolvingHistory(history);

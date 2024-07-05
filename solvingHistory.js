@@ -8,7 +8,6 @@ export const saveSolve = async (solve) => {
         history.push(solve);
         await AsyncStorage.setItem(SOLVING_HISTORY_KEY, JSON.stringify(history));
         console.log('Saving solve:', solve);
-        console.log('Current solving history:', history);
     } catch (error) {
         console.error('Error saving solving history:', error);
     }

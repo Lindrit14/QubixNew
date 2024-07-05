@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, AsyncStorage } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import { Picker } from '@react-native-picker/picker';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 const AlgorithmScreen = () => {
-    const navigation = useNavigation();
     const [algorithm, setAlgorithm] = useState('CFOP');
 
     useEffect(() => {
@@ -25,14 +24,23 @@ const AlgorithmScreen = () => {
     return (
         <View style={styles.container}>
             <Text style={styles.title}>Select Solving Algorithm</Text>
-            <Picker
-                selectedValue={algorithm}
-                style={styles.picker}
-                onValueChange={(itemValue) => handleAlgorithmChange(itemValue)}
-            >
-                <Picker.Item label="CFOP" value="CFOP" />
-                <Picker.Item label="Roux" value="Roux" />
-            </Picker>
+            <Text style={styles.selectedAlgorithmText}>Currently Selected: {algorithm}</Text>
+            <Text style={styles.selectedAlgorithmText}>Reset Cube after choosing!</Text>
+            <View style={styles.buttonContainer}>
+                <TouchableOpacity
+                    style={[styles.algorithmButton, algorithm === 'CFOP' && styles.selectedButton]}
+                    onPress={() => handleAlgorithmChange('CFOP')}
+                >
+                    <Text style={styles.buttonText}>CFOP</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                    style={[styles.algorithmButton, algorithm === 'Kociemba' && styles.selectedButton]}
+                    onPress={() => handleAlgorithmChange('Kociemba')}
+                >
+                    <Text style={styles.buttonText}>Kociemba</Text>
+                </TouchableOpacity>
+            </View>
+
         </View>
     );
 };
@@ -51,10 +59,30 @@ const styles = StyleSheet.create({
         color: 'white',
         marginBottom: 20,
     },
-    picker: {
-        height: 50,
-        width: 200,
+    selectedAlgorithmText: {
+        fontSize: 18,
         color: 'white',
+        marginBottom: 20,
+    },
+    buttonContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        width: '100%',
+    },
+    algorithmButton: {
+        backgroundColor: 'blue',
+        padding: 15,
+        margin: 10,
+        borderRadius: 10,
+        width: '40%',
+        alignItems: 'center',
+    },
+    selectedButton: {
+        backgroundColor: 'green',
+    },
+    buttonText: {
+        color: 'white',
+        fontSize: 18,
     },
 });
 

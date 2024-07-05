@@ -14,6 +14,11 @@ const HistoryScreen = () => {
         fetchSolvingHistory();
     }, []);
 
+    const formatDate = (isoString) => {
+        const options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true };
+        return new Date(isoString).toLocaleDateString(undefined, options);
+    };
+
     return (
         <ScrollView contentContainerStyle={styles.container}>
             <Text style={styles.title}>Solving History</Text>
@@ -22,7 +27,7 @@ const HistoryScreen = () => {
             ) : (
                 solvingHistory.map((solve, index) => (
                     <View key={index} style={styles.historyItem}>
-                        <Text>{`Date: ${solve.date}`}</Text>
+                        <Text>{`Date: ${formatDate(solve.date)}`}</Text>
                         <Text>{`Steps: ${solve.steps.join(' ')}`}</Text>
                     </View>
                 ))
