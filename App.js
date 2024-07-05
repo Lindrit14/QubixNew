@@ -12,6 +12,7 @@ import AnalysisScreen from './AnalysisScreen';
 import HistoryScreen from './HistoryScreen';
 import SettingsScreen from './SettingsScreen';
 import AlgorithmScreen from './AlgorithmScreen';
+import CubeTester from './CubeTester';
 
 const Stack = createNativeStackNavigator();
 
@@ -38,6 +39,7 @@ export default function App() {
             <Stack.Screen name="History" component={HistoryScreen} />
             <Stack.Screen name="Settings" component={SettingsScreen} />
             <Stack.Screen name="Algorithm" component={AlgorithmScreen} />
+            <Stack.Screen name="CubeTester" component={CubeTester} />
           </>
         ) : (
           <>

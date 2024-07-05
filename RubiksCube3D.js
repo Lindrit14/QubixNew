@@ -28,9 +28,9 @@ const RubiksCube3D = ({ cubeState, rotation }) => {
 
     const positions = [
         { face: 'U', position: [0, 1.5, 0], rotation: [-Math.PI / 2, 0, 0] },
-        { face: 'L', position: [-1.5, 0, 0], rotation: [0, Math.PI / 2, 0] },
+        { face: 'L', position: [-1.5, 0, 0], rotation: [0, Math.PI / 2, Math.PI] },
         { face: 'F', position: [0, 0, 1.5], rotation: [0, 0, 0] },
-        { face: 'R', position: [1.5, 0, 0], rotation: [0, -Math.PI / 2, 0] },
+        { face: 'R', position: [1.5, 0, 0], rotation: [0, -Math.PI / 2, Math.PI] },
         { face: 'B', position: [0, 0, -1.5], rotation: [0, Math.PI, 0] },
         { face: 'D', position: [0, -1.5, 0], rotation: [Math.PI / 2, 0, 0] },
     ];

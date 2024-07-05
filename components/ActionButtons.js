@@ -14,6 +14,9 @@ const ActionButtons = ({ isSolvable, handleSolve, resetCube, handleLogout, navig
             <TouchableOpacity style={[styles.actionButton, { backgroundColor: 'blue' }]} onPress={() => navigation.navigate('InputInfo')}>
                 <Text style={styles.buttonText}>Input Info</Text>
             </TouchableOpacity>
+            <TouchableOpacity style={[styles.actionButton, { backgroundColor: 'blue' }]} onPress={() => navigation.navigate('CubeTester')}>
+                <Text style={styles.buttonText}>Cube-Testing</Text>
+            </TouchableOpacity>
             <TouchableOpacity style={[styles.actionButton, { backgroundColor: 'orange' }]} onPress={resetCube}>
                 <Text style={styles.buttonText}>Reset Cube</Text>
             </TouchableOpacity>
