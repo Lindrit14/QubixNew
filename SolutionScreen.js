@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, FlatList, Alert } from 'react-native';
+import { View, Text, StyleSheet, FlatList, Alert, Button } from 'react-native';
 import RubiksCube3D from './RubiksCube3D';
 import solver from 'rubiks-cube-solver';
 import cubeSolver from 'cube-solver';
@@ -84,8 +84,6 @@ const SolutionScreen = ({ route, navigation }) => {
     blue: 'b',
     yellow: 'd'
   };
-
-
 
   const mapColorsToChars = (str) => {
     return str.replace(/green|orange|white|red|blue|yellow/g, matched => colorToChar[matched]);
@@ -205,7 +203,6 @@ const SolutionScreen = ({ route, navigation }) => {
     'Sprime': 'S',
     'S2': 'S2'
   };
-
 
   const logCubeState = (state, step) => {
     console.log(`Cube State after ${step}:`, JSON.stringify(state, null, 2));
@@ -353,7 +350,6 @@ const SolutionScreen = ({ route, navigation }) => {
     setStepStartTime(new Date());
   };
 
-
   const resetCube = () => {
     setRotation([0, 0, 0]);
   };
@@ -388,6 +384,10 @@ const SolutionScreen = ({ route, navigation }) => {
       )}
       <Text style={styles.currentStepText}>Current Step: {solutionSteps[currentStep]}</Text>
       <Text style={styles.solutionText}>Solution Moves: {solutionSteps.join(' ')}</Text>
+      <Button title="Save Progress" onPress={async () => {
+        await saveCurrentProgress(currentCubeState);
+        Alert.alert('Progress Saved');
+      }} />
     </View>
   );
 };
@@ -407,9 +407,9 @@ const styles = StyleSheet.create({
     color: 'white'
   },
   cube3DContainer: {
-    height: 300,
-    width: 300,
-    marginBottom: 20,
+    height: 250,
+    width: 250,
+    marginBottom: 10,
   },
   stepText: {
     fontSize: 18,
@@ -425,7 +425,7 @@ const styles = StyleSheet.create({
   },
   solutionText: {
     fontSize: 18,
-    marginTop: 10,
+    marginTop: 5,
     color: 'white'
   },
 });

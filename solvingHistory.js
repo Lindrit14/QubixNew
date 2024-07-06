@@ -1,6 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const SOLVING_HISTORY_KEY = 'solving_history';
+const CURRENT_PROGRESS_KEY = 'current_progress';
 
 export const saveSolve = async (solve) => {
     try {
@@ -23,31 +24,30 @@ export const getSolvingHistory = async () => {
     }
 };
 
-// Save the current progress
-export const saveCurrentProgress = async (progress) => {
+export const saveCurrentProgress = async (cubeState) => {
     try {
-        await AsyncStorage.setItem('currentProgress', JSON.stringify(progress));
+        await AsyncStorage.setItem(CURRENT_PROGRESS_KEY, JSON.stringify(cubeState));
+        console.log('Current progress saved:', cubeState);
     } catch (error) {
-        console.error("Error saving current progress:", error);
+        console.error('Error saving current progress:', error);
     }
 };
 
-// Load the current progress
 export const loadCurrentProgress = async () => {
     try {
-        const progress = await AsyncStorage.getItem('currentProgress');
+        const progress = await AsyncStorage.getItem(CURRENT_PROGRESS_KEY);
         return progress ? JSON.parse(progress) : null;
     } catch (error) {
-        console.error("Error loading current progress:", error);
+        console.error('Error loading current progress:', error);
         return null;
     }
 };
 
-// Clear the current progress
 export const clearCurrentProgress = async () => {
     try {
-        await AsyncStorage.removeItem('currentProgress');
+        await AsyncStorage.removeItem(CURRENT_PROGRESS_KEY);
+        console.log('Current progress cleared');
     } catch (error) {
-        console.error("Error clearing current progress:", error);
+        console.error('Error clearing current progress:', error);
     }
 };
