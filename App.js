@@ -2,17 +2,17 @@ import React, { useEffect, useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { onAuthStateChanged } from 'firebase/auth';
-import { auth } from './firebaseConfig';
-import LoginScreen from './LoginScreen';
-import RegisterScreen from './registerScreen';
-import CubeInputScreen from './CubeInputScreen';
-import SolutionScreen from './SolutionScreen';
-import InputInfoScreen from './InputInfoScreen';
-import AnalysisScreen from './AnalysisScreen';
-import HistoryScreen from './HistoryScreen';
-import SettingsScreen from './SettingsScreen';
-import AlgorithmScreen from './AlgorithmScreen';
-import CubeTester from './CubeTester';
+import { auth } from './src/firebase/firebaseConfig';
+import LoginScreen from './src/Pages/LoginScreen';
+import RegisterScreen from './src/Pages/registerScreen';
+import CubeInputScreen from './src/Pages/CubeInputScreen';
+import SolutionScreen from './src/Pages/SolutionScreen';
+import InputInfoScreen from './src/Pages/InputInfoScreen';
+import AnalysisScreen from './src/Pages/AnalysisScreen';
+import HistoryScreen from './src/Pages/HistoryScreen';
+import SettingsScreen from './src/Pages/SettingsScreen';
+import AlgorithmScreen from './src/Pages/AlgorithmScreen';
+import CubeTester from './src/Pages/CubeTester';
 
 const Stack = createNativeStackNavigator();
 

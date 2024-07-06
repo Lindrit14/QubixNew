@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, Button, StyleSheet } from 'react-native';
-import RubiksCube3D from './RubiksCube3D';
-import CubeControls from './components/CubeControls';
+import RubiksCube3D from '../components/RubiksCube3D';
+import CubeControls from '../components/CubeControls';
 import {
     rotateRight,
     rotateRightInverse,
@@ -30,7 +30,7 @@ import {
     rotateStanding,
     rotateStandingInverse,
     rotateStanding180,
-} from './cubeRotation';
+} from '../components/cubeRotation';
 
 const CubeTester = () => {
     const solvedCube = {

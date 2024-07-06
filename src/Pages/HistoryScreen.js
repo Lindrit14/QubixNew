@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, FlatList } from 'react-native';
-import { getSolvingHistory } from './solvingHistory';
+import { getSolvingHistory } from '../components/solvingHistory';
 
 const HistoryScreen = () => {
     const [solvingHistory, setSolvingHistory] = useState([]);

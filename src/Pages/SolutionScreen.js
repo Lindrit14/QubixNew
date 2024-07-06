@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, FlatList, Alert, TouchableOpacity } from 'react-native';
-import RubiksCube3D from './RubiksCube3D';
-import solver from 'rubiks-cube-solver';
-import cubeSolver from 'cube-solver';
-import { saveSolve, getSolvingHistory, saveCurrentProgress, loadCurrentProgress, clearCurrentProgress } from './solvingHistory';
-import CubeTimer from './components/CubeTimer';
-import CubeControls from './components/CubeControls';
-import StepControls from './components/StepControls';
+import RubiksCube3D from '../components/RubiksCube3D';
+import { saveSolve, getSolvingHistory, saveCurrentProgress } from '../components/solvingHistory';
+import CubeTimer from '../components/CubeTimer';
+import CubeControls from '../components/CubeControls';
+import StepControls from '../components/StepControls';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   rotateRight,
@@ -36,7 +34,7 @@ import {
   rotateStanding,
   rotateStandingInverse,
   rotateStanding180,
-} from './cubeRotation';
+} from '../components/cubeRotation';
 
 const SolutionScreen = ({ route, navigation }) => {
   const { cubeState, solutionAlgorithm, moves } = route.params;

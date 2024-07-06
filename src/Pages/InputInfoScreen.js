@@ -6,7 +6,7 @@ const InputInfoScreen = () => {
         <ScrollView contentContainerStyle={styles.container}>
             <Text style={styles.title}>Cube Input Information</Text>
             <Text style={styles.infoText}>Default Cube Postion:</Text>
-            <Image source={require('./assets/CubeLayout.png')} style={styles.image} />
+            <Image source={require('../../assets/CubeLayout.png')} style={styles.image} />
         </ScrollView>
     );
 };

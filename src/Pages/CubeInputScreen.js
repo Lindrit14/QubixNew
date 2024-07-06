@@ -2,15 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { View, ScrollView, StyleSheet, Text, Alert, Modal, ActivityIndicator, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { signOut } from 'firebase/auth';
-import { auth } from './firebaseConfig';
+import { auth } from '../firebase/firebaseConfig';
 import solver from 'rubiks-cube-solver';
-import ColorPicker from './components/ColorPicker';
-import CubeFaces from './components/CubeFaces';
-import ActionButtons from './components/ActionButtons';
+import ColorPicker from '../components/ColorPicker';
+import CubeFaces from '../components/CubeFaces';
+import ActionButtons from '../components/ActionButtons';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import min2phase from 'min2phase.js';
-import { loadCurrentProgress } from './solvingHistory';
+import { loadCurrentProgress } from '../components/solvingHistory';
 
 const initialFaceState = new Array(9).fill('white');
 

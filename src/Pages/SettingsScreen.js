@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { auth } from './firebaseConfig';
+import { auth } from '../firebase/firebaseConfig';
 
 const SettingsScreen = () => {
     const navigation = useNavigation();

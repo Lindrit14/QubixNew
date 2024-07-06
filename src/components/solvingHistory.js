@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { auth } from './firebaseConfig';
+import { auth } from '../firebase/firebaseConfig';
 
 const getKeyWithUserEmail = (key) => {
     const userEmail = auth.currentUser ? auth.currentUser.email : 'default';
