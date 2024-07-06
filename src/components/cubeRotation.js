@@ -144,24 +144,15 @@ const rotateUp180 = (cube) => {
 
 const rotateFront = (cube) => {
     const newCube = { ...cube };
-    console.log("newCube", newCube)
-    console.log('cube.F:', cube.F);
 
     // Rotate the front face first
     newCube.F = rotateFaceClockwise(cube.F);
 
-    console.log("After rotating front face, newCube:", newCube);
-
     // Store the current states of the surrounding faces
     const tempU = [cube.U[6], cube.U[7], cube.U[8]];
-    console.log('tempU:', tempU);
     const tempR = [cube.R[0], cube.R[3], cube.R[6]];
-    console.log('tempR:', tempR);
     const tempD = [cube.D[0], cube.D[1], cube.D[2]];
-    console.log('tempD:', tempD);
     const tempL = [cube.L[2], cube.L[5], cube.L[8]];
-    console.log('tempL:', tempL);
-
 
     // Swap the elements of the surrounding faces
     newCube.U[6] = tempL[2];
@@ -172,9 +163,9 @@ const rotateFront = (cube) => {
     newCube.R[3] = tempU[1];
     newCube.R[6] = tempU[2];
 
-    newCube.D[0] = tempR[0];
+    newCube.D[0] = tempR[2];
     newCube.D[1] = tempR[1];
-    newCube.D[2] = tempR[2];
+    newCube.D[2] = tempR[0];
 
     newCube.L[2] = tempD[0];
     newCube.L[5] = tempD[1];
@@ -191,8 +182,8 @@ const rotateFrontInverse = (cube) => {
     newCube.F = rotateFaceCounterClockwise(cube.F);
 
     const tempU = [cube.U[6], cube.U[7], cube.U[8]];
-    const tempR = [cube.R[0], cube.R[3], cube.R[6]];
-    const tempD = [cube.D[0], cube.D[1], cube.D[2]];
+    const tempR = [cube.R[6], cube.R[3], cube.R[0]];
+    const tempD = [cube.D[2], cube.D[1], cube.D[0]];
     const tempL = [cube.L[2], cube.L[5], cube.L[8]];
 
     newCube.U[6] = tempR[2];
@@ -203,9 +194,9 @@ const rotateFrontInverse = (cube) => {
     newCube.R[3] = tempD[1];
     newCube.R[6] = tempD[2];
 
-    newCube.D[0] = tempL[2];
+    newCube.D[0] = tempL[0];
     newCube.D[1] = tempL[1];
-    newCube.D[2] = tempL[0];
+    newCube.D[2] = tempL[2];
 
     newCube.L[2] = tempU[2];
     newCube.L[5] = tempU[1];
@@ -224,7 +215,7 @@ const rotateLeft = (cube) => {
 
     const tempU = [cube.U[0], cube.U[3], cube.U[6]];
     const tempF = [cube.F[0], cube.F[3], cube.F[6]];
-    const tempD = [cube.D[0], cube.D[3], cube.D[6]];
+    const tempD = [cube.D[6], cube.D[3], cube.D[0]];
     const tempB = [cube.B[8], cube.B[5], cube.B[2]];
 
     newCube.U[0] = tempB[0];
@@ -253,7 +244,7 @@ const rotateLeftInverse = (cube) => {
     const tempU = [cube.U[0], cube.U[3], cube.U[6]];
     const tempF = [cube.F[0], cube.F[3], cube.F[6]];
     const tempD = [cube.D[0], cube.D[3], cube.D[6]];
-    const tempB = [cube.B[8], cube.B[5], cube.B[2]];
+    const tempB = [cube.B[2], cube.B[5], cube.B[8]];
 
     newCube.U[0] = tempF[0];
     newCube.U[3] = tempF[1];
