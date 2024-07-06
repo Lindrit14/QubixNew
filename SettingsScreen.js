@@ -1,13 +1,24 @@
-import React from 'react';
+// SettingsScreen.js
+import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { auth } from './firebaseConfig';
 
 const SettingsScreen = () => {
     const navigation = useNavigation();
+    const [userEmail, setUserEmail] = useState('');
+
+    useEffect(() => {
+        const user = auth.currentUser;
+        if (user) {
+            setUserEmail(user.email);
+        }
+    }, []);
 
     return (
         <View style={styles.container}>
             <Text style={styles.title}>Settings</Text>
+            {userEmail ? <Text style={styles.emailText}>Logged in as: {userEmail}</Text> : null}
             <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('History')}>
                 <Text style={styles.buttonText}>Solving History</Text>
             </TouchableOpacity>
@@ -31,6 +42,11 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         color: 'white',
         marginBottom: 40,
+    },
+    emailText: {
+        fontSize: 16,
+        color: 'white',
+        marginBottom: 20,
     },
     button: {
         backgroundColor: 'blue',

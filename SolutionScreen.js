@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, FlatList, Alert, Button } from 'react-native';
+import { View, Text, StyleSheet, FlatList, Alert, TouchableOpacity } from 'react-native';
 import RubiksCube3D from './RubiksCube3D';
 import solver from 'rubiks-cube-solver';
 import cubeSolver from 'cube-solver';
@@ -204,6 +204,7 @@ const SolutionScreen = ({ route, navigation }) => {
     'S2': 'S2'
   };
 
+
   const logCubeState = (state, step) => {
     console.log(`Cube State after ${step}:`, JSON.stringify(state, null, 2));
   };
@@ -350,8 +351,23 @@ const SolutionScreen = ({ route, navigation }) => {
     setStepStartTime(new Date());
   };
 
+
   const resetCube = () => {
     setRotation([0, 0, 0]);
+  };
+
+  const saveProgress = async () => {
+    await saveCurrentProgress({
+      currentCubeState,
+      currentStep,
+      solutionSteps,
+      startTime,
+      stepTimes,
+      overallTime,
+      isSolved,
+      stepStartTime,
+    });
+    Alert.alert("Progress Saved", "Your current progress has been saved.");
   };
 
   const renderStep = ({ item, index }) => (
@@ -374,6 +390,9 @@ const SolutionScreen = ({ route, navigation }) => {
         resetCube={resetCube}
         showAnalysis={() => navigation.navigate('Analysis', { stepTimes, totalTimeTaken: overallTime.toFixed(2) })}
       />
+      <TouchableOpacity style={styles.actionButton} onPress={saveProgress}>
+        <Text style={styles.buttonText}>Save Progress</Text>
+      </TouchableOpacity>
       {!isSolved && (
         <FlatList
           data={solutionSteps}
@@ -384,10 +403,6 @@ const SolutionScreen = ({ route, navigation }) => {
       )}
       <Text style={styles.currentStepText}>Current Step: {solutionSteps[currentStep]}</Text>
       <Text style={styles.solutionText}>Solution Moves: {solutionSteps.join(' ')}</Text>
-      <Button title="Save Progress" onPress={async () => {
-        await saveCurrentProgress(currentCubeState);
-        Alert.alert('Progress Saved');
-      }} />
     </View>
   );
 };
@@ -427,6 +442,17 @@ const styles = StyleSheet.create({
     fontSize: 18,
     marginTop: 5,
     color: 'white'
+  },
+  actionButton: {
+    backgroundColor: 'blue',
+    padding: 10,
+    borderRadius: 5,
+    alignItems: 'center',
+    marginVertical: 5,
+  },
+  buttonText: {
+    color: 'white',
+    fontSize: 16,
   },
 });
 

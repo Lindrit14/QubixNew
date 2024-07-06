@@ -1,4 +1,3 @@
-// RubiksCube3D.js
 import React, { useMemo, useEffect } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { animated, useSpring } from '@react-spring/three';
@@ -7,11 +6,11 @@ import * as THREE from 'three';
 const faceColors = ['U', 'L', 'F', 'R', 'B', 'D'];
 
 const RubiksCube3D = ({ cubeState, rotation }) => {
-    const [springProps, setSpringProps] = useSpring(() => ({ rotation: [0, 0, 0] }));
+    const [springProps, api] = useSpring(() => ({ rotation: [0, 0, 0] }));
 
     useEffect(() => {
-        setSpringProps({ rotation });
-    }, [rotation, setSpringProps]);
+        api.start({ rotation });
+    }, [rotation, api]);
 
     const faces = useMemo(() => {
         const geometry = new THREE.PlaneGeometry(1, 1);
@@ -28,7 +27,7 @@ const RubiksCube3D = ({ cubeState, rotation }) => {
 
     const positions = [
         { face: 'U', position: [0, 1.5, 0], rotation: [-Math.PI / 2, 0, 0] },
-        { face: 'L', position: [-1.5, 0, 0], rotation: [Math.PI, - Math.PI / 2, Math.PI] },
+        { face: 'L', position: [-1.5, 0, 0], rotation: [Math.PI, -Math.PI / 2, Math.PI] },
         { face: 'F', position: [0, 0, 1.5], rotation: [0, 0, 0] },
         { face: 'R', position: [1.5, 0, 0], rotation: [0, Math.PI / 2, 0] },
         { face: 'B', position: [0, 0, -1.5], rotation: [0, Math.PI, 0] },

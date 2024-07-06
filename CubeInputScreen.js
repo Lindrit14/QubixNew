@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, ScrollView, StyleSheet, Text, Alert, Modal, ActivityIndicator, TouchableOpacity, Button } from 'react-native';
+import { View, ScrollView, StyleSheet, Text, Alert, Modal, ActivityIndicator, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { signOut } from 'firebase/auth';
 import { auth } from './firebaseConfig';
@@ -123,6 +123,10 @@ const CubeInputScreen = () => {
         moves = solver(filteredCubeString); // Use CFOP
       } else if (algorithm === 'min2phase') {
         min2phase.initFull();
+        /*
+        var cube = min2phase.randomCube();
+        console.log('min2phase Cube:', cube);
+        */
         const rearrangedString = rearrangeToMin2Phase(filteredCubeString);
         console.log('min2phase Rearranged String:', rearrangedString);
         moves = min2phase.solve(rearrangedString);
@@ -131,12 +135,23 @@ const CubeInputScreen = () => {
         throw new Error('Unsupported algorithm selected');
       }
 
+
       setLoading(false);
       navigation.navigate('Solution', { cubeState, solutionAlgorithm: algorithm, moves: moves });
     } catch (error) {
       setLoading(false);
       console.error(error);
       Alert.alert("Unsolvable Configuration", "Please adjust your cube configuration before solving.");
+    }
+  };
+
+  const loadProgress = async () => {
+    const progress = await loadCurrentProgress();
+    if (progress) {
+      setCubeState(progress.currentCubeState);
+      Alert.alert("Progress Loaded", "Your previous progress has been loaded.");
+    } else {
+      Alert.alert("No Saved Progress", "There is no saved progress to load.");
     }
   };
 
@@ -152,15 +167,9 @@ const CubeInputScreen = () => {
           handleLogout={handleLogout}
           navigation={navigation}
         />
-        <Button title="Load Progress" onPress={async () => {
-          const savedState = await loadCurrentProgress();
-          if (savedState) {
-            console.log('Loaded saved progress:', savedState)
-            setCubeState(savedState);
-          } else {
-            Alert.alert('No saved progress found');
-          }
-        }} />
+        <TouchableOpacity style={styles.actionButton} onPress={loadProgress}>
+          <Text style={styles.buttonText}>Load Progress</Text>
+        </TouchableOpacity>
         <Modal visible={loading} transparent>
           <View style={styles.loadingContainer}>
             <ActivityIndicator size="large" color="#00ff00" />
@@ -198,6 +207,17 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 20,
     right: 20,
+  },
+  actionButton: {
+    backgroundColor: 'blue',
+    padding: 10,
+    borderRadius: 5,
+    alignItems: 'center',
+    marginVertical: 5,
+  },
+  buttonText: {
+    color: 'white',
+    fontSize: 16,
   },
 });
 
