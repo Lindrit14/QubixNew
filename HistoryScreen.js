@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, FlatList } from 'react-native';
 import { getSolvingHistory } from './solvingHistory';
 
 const HistoryScreen = () => {
@@ -8,7 +8,7 @@ const HistoryScreen = () => {
     useEffect(() => {
         const fetchSolvingHistory = async () => {
             const history = await getSolvingHistory();
-            setSolvingHistory(history);
+            setSolvingHistory(history.reverse());
         };
 
         fetchSolvingHistory();
@@ -19,20 +19,27 @@ const HistoryScreen = () => {
         return new Date(isoString).toLocaleDateString(undefined, options);
     };
 
+    const renderItem = ({ item }) => (
+        <View style={styles.historyItem}>
+            <Text>{`Date: ${formatDate(item.date)}`}</Text>
+            <Text>{`Steps: ${item.steps.join(' ')}`}</Text>
+        </View>
+    );
+
     return (
-        <ScrollView contentContainerStyle={styles.container}>
+        <View style={styles.container}>
             <Text style={styles.title}>Solving History</Text>
             {solvingHistory.length === 0 ? (
                 <Text style={styles.noHistory}>No solving history found.</Text>
             ) : (
-                solvingHistory.map((solve, index) => (
-                    <View key={index} style={styles.historyItem}>
-                        <Text>{`Date: ${formatDate(solve.date)}`}</Text>
-                        <Text>{`Steps: ${solve.steps.join(' ')}`}</Text>
-                    </View>
-                ))
+                <FlatList
+                    data={solvingHistory}
+                    renderItem={renderItem}
+                    keyExtractor={(item, index) => index.toString()}
+                    contentContainerStyle={styles.listContent}
+                />
             )}
-        </ScrollView>
+        </View>
     );
 };
 
@@ -52,6 +59,9 @@ const styles = StyleSheet.create({
         fontSize: 18,
         textAlign: 'center',
         marginTop: 20,
+    },
+    listContent: {
+        paddingBottom: 20,
     },
     historyItem: {
         padding: 10,

@@ -34,10 +34,10 @@ const AlgorithmScreen = () => {
                     <Text style={styles.buttonText}>CFOP</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
-                    style={[styles.algorithmButton, algorithm === 'Kociemba' && styles.selectedButton]}
-                    onPress={() => handleAlgorithmChange('Kociemba')}
+                    style={[styles.algorithmButton, algorithm === 'min2phase' && styles.selectedButton]}
+                    onPress={() => handleAlgorithmChange('min2phase')}
                 >
-                    <Text style={styles.buttonText}>Kociemba</Text>
+                    <Text style={styles.buttonText}>min2phase</Text>
                 </TouchableOpacity>
             </View>
 

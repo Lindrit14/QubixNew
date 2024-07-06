@@ -9,7 +9,7 @@ import CubeFaces from './components/CubeFaces';
 import ActionButtons from './components/ActionButtons';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import cubeSolver from 'cube-solver';
+import min2phase from 'min2phase.js';
 
 
 const initialFaceState = new Array(9).fill('white');
@@ -83,6 +83,19 @@ const CubeInputScreen = () => {
     setIsSolvable(false);
   };
 
+  const rearrangeToMin2Phase = (filteredCubeString) => {
+    const getFace = (face) => filteredCubeString.slice(face * 9, (face + 1) * 9).toUpperCase();;
+
+    const F = getFace(0);
+    const R = getFace(1);
+    const U = getFace(2);
+    const D = getFace(3);
+    const L = getFace(4);
+    const B = getFace(5);
+
+    return U + R + F + D + L + B;
+  };
+
   const handleSolve = async () => {
     setLoading(true);
     try {
@@ -104,22 +117,27 @@ const CubeInputScreen = () => {
         yellow: 'd'
       }[matched]));
 
-
-
-
       let moves;
+      console.log("Algorithm:", algorithm)
       if (algorithm === 'CFOP') {
         moves = solver(filteredCubeString); // Use CFOP
-      } else if (algorithm === 'Kociemba') {
-        moves = cubeSolver.solve(filteredCubeString, 'kociemba'); // Use Kociemba
-        console.log('Kociemba Moves:', moves);
+      } else if (algorithm === 'min2phase') {
+        min2phase.initFull();
+        /*
+        var cube = min2phase.randomCube();
+        console.log('min2phase Cube:', cube);
+        */
+        const rearrangedString = rearrangeToMin2Phase(filteredCubeString);
+        console.log('min2phase Rearranged String:', rearrangedString);
+        moves = min2phase.solve(rearrangedString);
+        console.log('min2phase Moves:', moves);
       } else {
         throw new Error('Unsupported algorithm selected');
       }
 
 
       setLoading(false);
-      navigation.navigate('Solution', { cubeState });
+      navigation.navigate('Solution', { cubeState, solutionAlgorithm: algorithm, moves: moves });
     } catch (error) {
       setLoading(false);
       console.error(error);

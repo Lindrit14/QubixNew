@@ -2,10 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, FlatList, Alert } from 'react-native';
 import RubiksCube3D from './RubiksCube3D';
 import solver from 'rubiks-cube-solver';
-import { saveSolve, getSolvingHistory } from './solvingHistory';
+import cubeSolver from 'cube-solver';
+import { saveSolve, getSolvingHistory, saveCurrentProgress, loadCurrentProgress, clearCurrentProgress } from './solvingHistory';
 import CubeTimer from './components/CubeTimer';
 import CubeControls from './components/CubeControls';
 import StepControls from './components/StepControls';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   rotateRight,
   rotateRightInverse,
@@ -37,7 +39,7 @@ import {
 } from './cubeRotation';
 
 const SolutionScreen = ({ route, navigation }) => {
-  const { cubeState, solutionAlgorithm } = route.params;
+  const { cubeState, solutionAlgorithm, moves } = route.params;
   const [rotation, setRotation] = useState([0, 0, 0]);
   const [currentStep, setCurrentStep] = useState(0);
   const [solutionSteps, setSolutionSteps] = useState([]);
@@ -82,6 +84,8 @@ const SolutionScreen = ({ route, navigation }) => {
     blue: 'b',
     yellow: 'd'
   };
+
+
 
   const mapColorsToChars = (str) => {
     return str.replace(/green|orange|white|red|blue|yellow/g, matched => colorToChar[matched]);
@@ -133,7 +137,6 @@ const SolutionScreen = ({ route, navigation }) => {
     const filteredCubeString = mapColorsToChars(cubeString);
 
     console.log('Original Cube State:', cubeState);
-    console.log('Filtered Cube String:', filteredCubeString); // Debugging output
 
     if (filteredCubeString.length !== 54 || !isValidCubeState(filteredCubeString)) {
       console.error('Invalid cube state:', filteredCubeString);
@@ -147,14 +150,14 @@ const SolutionScreen = ({ route, navigation }) => {
       return;
     }
 
+    console.log("algorithm", solutionAlgorithm)
     try {
-      const moves = solver(filteredCubeString);
-      setSolutionSteps(moves.split(' '));
+      setSolutionSteps(moves.split(' ').filter(step => step.trim() !== ''));
       setStartTime(new Date());
     } catch (error) {
       console.error('Error solving cube:', error);
     }
-  }, [cubeState]);
+  }, [cubeState, solutionAlgorithm]);
 
   const rotateCube = (axis, value) => {
     setRotation(prevRotation => {
@@ -166,33 +169,43 @@ const SolutionScreen = ({ route, navigation }) => {
 
   const inverseMoves = {
     'R': 'Rprime',
+    "R'": 'R',
     'Rprime': 'R',
     'R2': 'R2',
     'U': 'Uprime',
+    "U'": 'U',
     'Uprime': 'U',
     'U2': 'U2',
     'F': 'Fprime',
+    "F'": 'F',
     'Fprime': 'F',
     'F2': 'F2',
     'L': 'Lprime',
+    "L'": 'L',
     'Lprime': 'L',
     'L2': 'L2',
     'D': 'Dprime',
+    "D'": 'D',
     'Dprime': 'D',
     'D2': 'D2',
     'B': 'Bprime',
+    "B'": 'B',
     'Bprime': 'B',
     'B2': 'B2',
     'M': 'Mprime',
+    "M'": 'M',
     'Mprime': 'M',
     'M2': 'M2',
     'E': 'Eprime',
+    "E'": 'E',
     'Eprime': 'E',
     'E2': 'E2',
     'S': 'Sprime',
+    "S'": 'S',
     'Sprime': 'S',
     'S2': 'S2'
   };
+
 
   const logCubeState = (state, step) => {
     console.log(`Cube State after ${step}:`, JSON.stringify(state, null, 2));
@@ -253,6 +266,7 @@ const SolutionScreen = ({ route, navigation }) => {
         newState = rotateRight(currentCubeState);
         break;
       case "Rprime":
+      case "R'":
         newState = rotateRightInverse(currentCubeState);
         break;
       case 'R2':
@@ -262,6 +276,7 @@ const SolutionScreen = ({ route, navigation }) => {
         newState = rotateUp(currentCubeState);
         break;
       case "Uprime":
+      case "U'":
         newState = rotateUpInverse(currentCubeState);
         break;
       case 'U2':
@@ -271,6 +286,7 @@ const SolutionScreen = ({ route, navigation }) => {
         newState = rotateFront(currentCubeState);
         break;
       case "Fprime":
+      case "F'":
         newState = rotateFrontInverse(currentCubeState);
         break;
       case 'F2':
@@ -280,6 +296,7 @@ const SolutionScreen = ({ route, navigation }) => {
         newState = rotateLeft(currentCubeState);
         break;
       case "Lprime":
+      case "L'":
         newState = rotateLeftInverse(currentCubeState);
         break;
       case 'L2':
@@ -289,6 +306,7 @@ const SolutionScreen = ({ route, navigation }) => {
         newState = rotateDown(currentCubeState);
         break;
       case "Dprime":
+      case "D'":
         newState = rotateDownInverse(currentCubeState);
         break;
       case 'D2':
@@ -298,6 +316,7 @@ const SolutionScreen = ({ route, navigation }) => {
         newState = rotateBack(currentCubeState);
         break;
       case "Bprime":
+      case "B'":
         newState = rotateBackInverse(currentCubeState);
         break;
       case 'B2':
@@ -307,18 +326,21 @@ const SolutionScreen = ({ route, navigation }) => {
         newState = rotateMiddle(currentCubeState);
         break;
       case "Mprime":
+      case "M'":
         newState = rotateMiddleInverse(currentCubeState);
         break;
       case 'E':
         newState = rotateEquatorial(currentCubeState);
         break;
       case "Eprime":
+      case "E'":
         newState = rotateEquatorialInverse(currentCubeState);
         break;
       case 'S':
         newState = rotateStanding(currentCubeState);
         break;
       case "Sprime":
+      case "S'":
         newState = rotateStandingInverse(currentCubeState);
         break;
       default:
@@ -330,6 +352,7 @@ const SolutionScreen = ({ route, navigation }) => {
     setCubeHistory([...cubeHistory, newState]);
     setStepStartTime(new Date());
   };
+
 
   const resetCube = () => {
     setRotation([0, 0, 0]);

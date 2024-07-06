@@ -23,3 +23,31 @@ export const getSolvingHistory = async () => {
     }
 };
 
+// Save the current progress
+export const saveCurrentProgress = async (progress) => {
+    try {
+        await AsyncStorage.setItem('currentProgress', JSON.stringify(progress));
+    } catch (error) {
+        console.error("Error saving current progress:", error);
+    }
+};
+
+// Load the current progress
+export const loadCurrentProgress = async () => {
+    try {
+        const progress = await AsyncStorage.getItem('currentProgress');
+        return progress ? JSON.parse(progress) : null;
+    } catch (error) {
+        console.error("Error loading current progress:", error);
+        return null;
+    }
+};
+
+// Clear the current progress
+export const clearCurrentProgress = async () => {
+    try {
+        await AsyncStorage.removeItem('currentProgress');
+    } catch (error) {
+        console.error("Error clearing current progress:", error);
+    }
+};
