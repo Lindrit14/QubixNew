@@ -29,7 +29,18 @@ export default function App() {
 
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName={user ? "CubeInput" : "Login"}>
+      <Stack.Navigator
+        initialRouteName={user ? "CubeInput" : "Login"}
+        screenOptions={{
+          headerStyle: {
+            backgroundColor: '#20232a',  // Change this to your desired color
+          },
+          headerTintColor: '#ffffff',  // Text color of the header
+          headerTitleStyle: {
+            fontWeight: 'bold',
+          },
+        }}
+      >
         {user ? (
           <>
             <Stack.Screen name="CubeInput" component={CubeInputScreen} />

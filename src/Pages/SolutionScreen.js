@@ -4,8 +4,8 @@ import RubiksCube3D from '../components/RubiksCube3D';
 import { saveSolve, getSolvingHistory, saveCurrentProgress } from '../components/solvingHistory';
 import CubeTimer from '../components/CubeTimer';
 import CubeControls from '../components/CubeControls';
-import StepControls from '../components/StepControls';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import LottieView from 'lottie-react-native';
 import {
   rotateRight,
   rotateRightInverse,
@@ -49,6 +49,7 @@ const SolutionScreen = ({ route, navigation }) => {
   const [isSolved, setIsSolved] = useState(false);
   const [stepStartTime, setStepStartTime] = useState(null);
   const [solvingHistory, setSolvingHistory] = useState([]);
+  const [showCelebration, setShowCelebration] = useState(false);
 
   useEffect(() => {
     const fetchSolvingHistory = async () => {
@@ -73,6 +74,15 @@ const SolutionScreen = ({ route, navigation }) => {
     }, 1000);
     return () => clearInterval(interval);
   }, [isSolved, startTime]);
+
+  useEffect(() => {
+    if (showCelebration) {
+      const timer = setTimeout(() => {
+        setShowCelebration(false);
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [showCelebration]);
 
   const colorToChar = {
     green: 'f',
@@ -202,12 +212,13 @@ const SolutionScreen = ({ route, navigation }) => {
     'S2': 'S2'
   };
 
-
   const logCubeState = (state, step) => {
     console.log(`Cube State after ${step}:`, JSON.stringify(state, null, 2));
   };
 
   const nextStep = async () => {
+    if (currentStep >= solutionSteps.length) return; // Disable if last step
+
     if (currentStep < solutionSteps.length) {
       const step = solutionSteps[currentStep];
       const stepStart = stepStartTime || new Date();
@@ -225,6 +236,7 @@ const SolutionScreen = ({ route, navigation }) => {
 
       if (checkIfSolved(currentCubeState)) {
         setIsSolved(true);
+        setShowCelebration(true);
         Alert.alert("Cube Solved!", `Congratulations! You have solved the cube in ${overallTime.toFixed(2)} seconds.`);
         const solve = {
           date: new Date().toISOString(),
@@ -251,6 +263,7 @@ const SolutionScreen = ({ route, navigation }) => {
       handleStep(inverseMoves[prevStep]);
       setCurrentStep(currentStep - 1);
       setStepTimes(prevStepTimes => prevStepTimes.slice(0, -1));
+      if (isSolved) setIsSolved(false); // If going back, cube is no longer solved
     }
   };
 
@@ -349,7 +362,6 @@ const SolutionScreen = ({ route, navigation }) => {
     setStepStartTime(new Date());
   };
 
-
   const resetCube = () => {
     setRotation([0, 0, 0]);
   };
@@ -382,16 +394,22 @@ const SolutionScreen = ({ route, navigation }) => {
         <RubiksCube3D cubeState={currentCubeState} rotation={rotation} />
       </View>
       <CubeControls rotateCube={rotateCube} />
-      <StepControls
-        nextStep={nextStep}
-        prevStep={prevStep}
-        resetCube={resetCube}
-        showAnalysis={() => navigation.navigate('Analysis', { stepTimes, totalTimeTaken: overallTime.toFixed(2) })}
-      />
+      <View style={styles.stepControls}>
+        <TouchableOpacity onPress={prevStep} style={styles.stepButton}>
+          <Text style={styles.stepButtonText}>←</Text>
+        </TouchableOpacity>
+        <Text style={styles.stepCounter}>{currentStep + 1}/{solutionSteps.length + 1}</Text>
+        <TouchableOpacity onPress={nextStep} style={[styles.stepButton, (isSolved || currentStep >= solutionSteps.length) && styles.disabledButton]} disabled={isSolved || currentStep >= solutionSteps.length}>
+          <Text style={styles.stepButtonText}>→</Text>
+        </TouchableOpacity>
+      </View>
       <TouchableOpacity style={styles.actionButton} onPress={saveProgress}>
         <Text style={styles.buttonText}>Save Progress</Text>
       </TouchableOpacity>
-      {!isSolved && (
+      <TouchableOpacity style={styles.actionButton} onPress={() => navigation.navigate('Analysis', { stepTimes, totalTimeTaken: overallTime.toFixed(2) })}>
+        <Text style={styles.buttonText}>Show Analysis</Text>
+      </TouchableOpacity>
+      {(currentStep < solutionSteps.length || !isSolved) && (
         <FlatList
           data={solutionSteps}
           renderItem={renderStep}
@@ -401,6 +419,14 @@ const SolutionScreen = ({ route, navigation }) => {
       )}
       <Text style={styles.currentStepText}>Current Step: {solutionSteps[currentStep]}</Text>
       <Text style={styles.solutionText}>Solution Moves: {solutionSteps.join(' ')}</Text>
+      {showCelebration && (
+        <LottieView
+          source={require('../../assets/celebration.json')}
+          autoPlay
+          loop={false}
+          style={styles.celebration}
+        />
+      )}
     </View>
   );
 };
@@ -423,6 +449,26 @@ const styles = StyleSheet.create({
     height: 250,
     width: 250,
     marginBottom: 10,
+  },
+  stepControls: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: 10,
+  },
+  stepButton: {
+    padding: 10,
+  },
+  stepButtonText: {
+    fontSize: 24,
+    color: 'white',
+  },
+  disabledButton: {
+    opacity: 0.5,
+  },
+  stepCounter: {
+    fontSize: 18,
+    color: 'white',
+    marginHorizontal: 10,
   },
   stepText: {
     fontSize: 18,
@@ -451,6 +497,14 @@ const styles = StyleSheet.create({
   buttonText: {
     color: 'white',
     fontSize: 16,
+  },
+  celebration: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    zIndex: 1,
   },
 });
 

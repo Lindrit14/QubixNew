@@ -21,8 +21,8 @@ const HistoryScreen = () => {
 
     const renderItem = ({ item }) => (
         <View style={styles.historyItem}>
-            <Text>{`Date: ${formatDate(item.date)}`}</Text>
-            <Text>{`Steps: ${item.steps.join(' ')}`}</Text>
+            <Text style={styles.historyText}>{`Date: ${formatDate(item.date)}`}</Text>
+            <Text style={styles.historyText}>{`Steps: ${item.steps.join(' ')}`}</Text>
         </View>
     );
 
@@ -47,18 +47,20 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         padding: 20,
-        backgroundColor: '#fff',
+        backgroundColor: '#282c34',
     },
     title: {
         fontSize: 24,
         fontWeight: 'bold',
         marginBottom: 20,
         textAlign: 'center',
+        color: '#ffffff',
     },
     noHistory: {
         fontSize: 18,
         textAlign: 'center',
         marginTop: 20,
+        color: '#ffffff'
     },
     listContent: {
         paddingBottom: 20,
@@ -68,6 +70,9 @@ const styles = StyleSheet.create({
         borderBottomWidth: 1,
         borderBottomColor: '#ccc',
         marginBottom: 10,
+    },
+    historyText: {
+        color: '#ffffff',
     },
 });
 
