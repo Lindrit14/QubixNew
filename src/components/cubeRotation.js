@@ -43,9 +43,9 @@ const rotateRight = (cube) => {
     newCube.D[5] = tempB[1];
     newCube.D[8] = tempB[2];
 
-    newCube.B[6] = tempU[2];
+    newCube.B[6] = tempU[0];
     newCube.B[3] = tempU[1];
-    newCube.B[0] = tempU[0];
+    newCube.B[0] = tempU[1];
 
     return newCube;
 };
@@ -71,15 +71,15 @@ const rotateRightInverse = (cube) => {
     newCube.D[5] = tempF[1];
     newCube.D[8] = tempF[2];
 
-    newCube.B[6] = tempD[2];
+    newCube.B[0] = tempD[2];
     newCube.B[3] = tempD[1];
-    newCube.B[0] = tempD[0];
+    newCube.B[6] = tempD[0];
 
     return newCube;
 };
 
 const rotateRight180 = (cube) => {
-    return rotateRight(rotateRight(cube));
+    return rotateRightInverse(rotateRightInverse(cube));
 };
 
 const rotateUp = (cube) => {
@@ -170,9 +170,6 @@ const rotateFront = (cube) => {
     newCube.L[2] = tempD[0];
     newCube.L[5] = tempD[1];
     newCube.L[8] = tempD[2];
-
-
-    console.log("After swapping surrounding face elements, newCube:", newCube);
 
     return newCube;
 };
