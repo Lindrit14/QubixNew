@@ -53,6 +53,7 @@ const SolutionScreen = ({ route, navigation }) => {
   const [solvingHistory, setSolvingHistory] = useState([]);
   const [showCelebration, setShowCelebration] = useState(false);
 
+
   useEffect(() => {
     const fetchSolvingHistory = async () => {
       const history = await getSolvingHistory();
@@ -64,6 +65,7 @@ const SolutionScreen = ({ route, navigation }) => {
 
   useEffect(() => {
     const initialTime = new Date();
+    console.log(moves)
     setStartTime(initialTime);
     setStepStartTime(initialTime);
   }, []);

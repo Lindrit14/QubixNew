@@ -12,6 +12,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import min2phase from 'min2phase.js';
 import { loadCurrentProgress } from '../components/solvingHistory';
 import { useLanguage } from '../context/LanguageContext';
+import Cube from 'cubejs';
 
 const initialFaceState = new Array(9).fill('white');
 
@@ -32,6 +33,9 @@ const CubeInputScreen = () => {
   const [algorithm, setAlgorithm] = useState('min2phase');
 
   useEffect(() => {
+    Cube.initSolver(); // Initialize the solver
+    min2phase.initFull(); // Initialize the min2phase solver
+
     checkSolvability();
     const getAlgorithm = async () => {
       const savedAlgorithm = await AsyncStorage.getItem('solvingAlgorithm');
@@ -83,6 +87,19 @@ const CubeInputScreen = () => {
     setCubeState(newState);
     console.log('Reset Cube State:', JSON.stringify(newState, null, 2));
     setIsSolvable(false);
+  };
+
+  const rearrangeToKociemba = (filteredCubeString) => {
+    const getFace = (face) => filteredCubeString.slice(face * 9, (face + 1) * 9).toUpperCase();
+
+    const F = getFace(0);
+    const R = getFace(1);
+    const U = getFace(2);
+    const D = getFace(3);
+    const L = getFace(4);
+    const B = getFace(5);
+
+    return U + R + F + D + L + B;
   };
 
   const rearrangeToMin2Phase = (filteredCubeString) => {
@@ -141,10 +158,12 @@ const CubeInputScreen = () => {
 
       let moves;
       console.log("Algorithm:", algorithm);
-      if (algorithm === 'CFOP') {
-        moves = solver(filteredCubeString); // Use CFOP
+      if (algorithm === 'Kociemba') {
+        const rearrangedString = rearrangeToKociemba(filteredCubeString);
+        const cube = Cube.fromString(rearrangedString);
+        moves = cube.solve();
+        console.log('Kociemba Moves:', moves);
       } else if (algorithm === 'min2phase') {
-        min2phase.initFull();
         const rearrangedString = rearrangeToMin2Phase(filteredCubeString);
         console.log('min2phase Rearranged String:', rearrangedString);
         moves = min2phase.solve(rearrangedString);
