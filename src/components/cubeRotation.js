@@ -203,7 +203,7 @@ const rotateFrontInverse = (cube) => {
 };
 
 const rotateFront180 = (cube) => {
-    return rotateFront(rotateFront(cube));
+    return rotateFrontInverse(rotateFrontInverse(cube));
 };
 
 const rotateLeft = (cube) => {
@@ -335,9 +335,9 @@ const rotateBack = (cube) => {
     const tempD = [cube.D[6], cube.D[7], cube.D[8]];
     const tempL = [cube.L[0], cube.L[3], cube.L[6]];
 
-    newCube.U[0] = tempR[2];
+    newCube.U[0] = tempR[0];
     newCube.U[1] = tempR[1];
-    newCube.U[2] = tempR[0];
+    newCube.U[2] = tempR[2];
 
     newCube.R[2] = tempD[2];
     newCube.R[5] = tempD[1];
@@ -383,7 +383,7 @@ const rotateBackInverse = (cube) => {
 };
 
 const rotateBack180 = (cube) => {
-    return rotateBackInverse(rotateBackInverse(cube));
+    return rotateBack(rotateBack(cube));
 };
 
 const rotateMiddle = (cube) => {

@@ -121,15 +121,8 @@ const SolutionScreen = ({ route, navigation }) => {
   };
 
   const checkIfSolved = (cubeState) => {
-    const solvedState = {
-      U: Array(9).fill('white'),
-      L: Array(9).fill('orange'),
-      F: Array(9).fill('green'),
-      R: Array(9).fill('red'),
-      B: Array(9).fill('blue'),
-      D: Array(9).fill('yellow')
-    };
-    return JSON.stringify(cubeState) === JSON.stringify(solvedState);
+    const faces = Object.values(cubeState);
+    return faces.every(face => face.every(color => color === face[0]));
   };
 
   useEffect(() => {
