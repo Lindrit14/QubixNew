@@ -45,7 +45,7 @@ const rotateRight = (cube) => {
 
     newCube.B[6] = tempU[0];
     newCube.B[3] = tempU[1];
-    newCube.B[0] = tempU[1];
+    newCube.B[0] = tempU[2];
 
     return newCube;
 };
@@ -79,7 +79,7 @@ const rotateRightInverse = (cube) => {
 };
 
 const rotateRight180 = (cube) => {
-    return rotateRightInverse(rotateRightInverse(cube));
+    return rotateRight(rotateRight(cube));
 };
 
 const rotateUp = (cube) => {
@@ -163,9 +163,9 @@ const rotateFront = (cube) => {
     newCube.R[3] = tempU[1];
     newCube.R[6] = tempU[2];
 
-    newCube.D[0] = tempR[2];
+    newCube.D[0] = tempR[0];
     newCube.D[1] = tempR[1];
-    newCube.D[2] = tempR[0];
+    newCube.D[2] = tempR[2];
 
     newCube.L[2] = tempD[0];
     newCube.L[5] = tempD[1];
@@ -339,9 +339,9 @@ const rotateBack = (cube) => {
     newCube.U[1] = tempR[1];
     newCube.U[2] = tempR[0];
 
-    newCube.R[2] = tempD[0];
+    newCube.R[2] = tempD[2];
     newCube.R[5] = tempD[1];
-    newCube.R[8] = tempD[2];
+    newCube.R[8] = tempD[0];
 
     newCube.D[6] = tempL[0];
     newCube.D[7] = tempL[1];
@@ -383,7 +383,7 @@ const rotateBackInverse = (cube) => {
 };
 
 const rotateBack180 = (cube) => {
-    return rotateBack(rotateBack(cube));
+    return rotateBackInverse(rotateBackInverse(cube));
 };
 
 const rotateMiddle = (cube) => {

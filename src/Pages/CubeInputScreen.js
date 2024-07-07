@@ -58,7 +58,7 @@ const CubeInputScreen = () => {
       [face]: newFaceState
     }));
     console.log('Updated Cube State:', JSON.stringify(cubeState, null, 2));
-    console.log("Algorithm:", algorithm)
+    console.log("Algorithm:", algorithm);
   };
 
   const checkSolvability = () => {
@@ -98,7 +98,27 @@ const CubeInputScreen = () => {
     return U + R + F + D + L + B;
   };
 
+  const checkIfSolved = (cubeState) => {
+    const solvedState = {
+      U: Array(9).fill('white'),
+      L: Array(9).fill('orange'),
+      F: Array(9).fill('green'),
+      R: Array(9).fill('red'),
+      B: Array(9).fill('blue'),
+      D: Array(9).fill('yellow')
+    };
+    return JSON.stringify(cubeState) === JSON.stringify(solvedState);
+  };
+
   const handleSolve = async () => {
+    if (checkIfSolved(cubeState)) {
+      Alert.alert(
+        language === 'english' ? 'Cube is already solved' : 'Der Würfel ist bereits gelöst',
+        language === 'english' ? 'The cube is already in a solved state.' : 'Der Würfel befindet sich bereits in einem gelösten Zustand.'
+      );
+      return;
+    }
+
     setLoading(true);
     try {
       const cubeString = [
@@ -120,7 +140,7 @@ const CubeInputScreen = () => {
       }[matched]));
 
       let moves;
-      console.log("Algorithm:", algorithm)
+      console.log("Algorithm:", algorithm);
       if (algorithm === 'CFOP') {
         moves = solver(filteredCubeString); // Use CFOP
       } else if (algorithm === 'min2phase') {

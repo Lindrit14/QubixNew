@@ -402,6 +402,7 @@ const SolutionScreen = ({ route, navigation }) => {
         <RubiksCube3D cubeState={currentCubeState} rotation={rotation} />
       </View>
       <CubeControls rotateCube={rotateCube} />
+      <Text style={styles.currentStepText}>{language === 'english' ? `Current Step: ${solutionSteps[currentStep]}` : `Aktueller Schritt: ${solutionSteps[currentStep]}`}</Text>
       <View style={styles.stepControls}>
         <TouchableOpacity onPress={prevStep} style={styles.stepButton}>
           <Text style={styles.stepButtonText}>←</Text>
@@ -428,7 +429,6 @@ const SolutionScreen = ({ route, navigation }) => {
           style={styles.stepList}
         />
       )}
-      <Text style={styles.currentStepText}>{language === 'english' ? `Current Step: ${solutionSteps[currentStep]}` : `Aktueller Schritt: ${solutionSteps[currentStep]}`}</Text>
       <Text style={styles.solutionText}>{language === 'english' ? `Solution Moves: ${solutionSteps.join(' ')}` : `Lösungszüge: ${solutionSteps.join(' ')}`}</Text>
       {showCelebration && (
         <LottieView
