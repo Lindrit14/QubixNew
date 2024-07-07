@@ -29,7 +29,7 @@ npx expo start
 ### Mobile Usage
 
 - Download the Expo Go App on your phone.
-- After starting the Expo server, scan the QR Code and the app will start.
+- After starting the Expo server, scan the QR Code which will redirect you to the App and open the project.
 
 ### User Guide
 Cube Layout
@@ -51,7 +51,7 @@ It's crucial to understand the cube's orientation to input and solve it correctl
 - **Check Solvability:** The app will automatically check if the cube state is valid and solvable. If not, adjust the colors.
 
 #### Solving the Cube
-- **Choose Solving Algorithm:** Select your preferred algorithm from the settings (CFOP or Min2Phase).
+- **Choose Solving Algorithm:** Select your preferred algorithm from the settings (We highly recommend Min2Phase instead of CFOP as for now).
 - **Solve the Cube:** Click on the "Solve Cube" button. The app will calculate the solution and provide step-by-step moves to solve the cube.
 - **Track Your Progress:** Follow the steps provided and track your progress using the 3D visualization.
 
