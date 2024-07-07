@@ -397,7 +397,6 @@ const SolutionScreen = ({ route, navigation }) => {
         <RubiksCube3D cubeState={currentCubeState} rotation={rotation} />
       </View>
       <CubeControls rotateCube={rotateCube} />
-      <Text style={styles.currentStepText}>{language === 'english' ? `Current Step: ${solutionSteps[currentStep]}` : `Aktueller Schritt: ${solutionSteps[currentStep]}`}</Text>
       <View style={styles.stepControls}>
         <TouchableOpacity onPress={prevStep} style={styles.stepButton}>
           <Text style={styles.stepButtonText}>←</Text>
@@ -407,6 +406,8 @@ const SolutionScreen = ({ route, navigation }) => {
           <Text style={styles.stepButtonText}>→</Text>
         </TouchableOpacity>
       </View>
+      <Text style={styles.currentStepText}>{language === 'english' ? `Current Step: ${solutionSteps[currentStep]}` : `Aktueller Schritt: ${solutionSteps[currentStep]}`}</Text>
+      <Text style={styles.solutionText}>{language === 'english' ? `Solution Moves: ${solutionSteps.join(' ')}` : `Lösungszüge: ${solutionSteps.join(' ')}`}</Text>
       <TouchableOpacity onPress={resetCube} style={styles.resetCube}>
         <Text style={styles.buttonText}>{language === 'english' ? 'Reset Position' : 'Position Zurücksetzen'}</Text>
       </TouchableOpacity>
@@ -416,15 +417,7 @@ const SolutionScreen = ({ route, navigation }) => {
       <TouchableOpacity style={styles.actionButton} onPress={() => navigation.navigate('Analysis', { stepTimes, totalTimeTaken: overallTime.toFixed(2) })}>
         <Text style={styles.buttonText}>{language === 'english' ? 'Show Analysis' : 'Analyse Anzeigen'}</Text>
       </TouchableOpacity>
-      {(currentStep < solutionSteps.length || !isSolved) && (
-        <FlatList
-          data={solutionSteps}
-          renderItem={renderStep}
-          keyExtractor={(item, index) => index.toString()}
-          style={styles.stepList}
-        />
-      )}
-      <Text style={styles.solutionText}>{language === 'english' ? `Solution Moves: ${solutionSteps.join(' ')}` : `Lösungszüge: ${solutionSteps.join(' ')}`}</Text>
+
       {showCelebration && (
         <LottieView
           source={require('../../assets/celebration.json')}
@@ -485,12 +478,13 @@ const styles = StyleSheet.create({
   },
   currentStepText: {
     fontSize: 18,
-    marginTop: 10,
+    marginTop: 5,
     color: 'white'
   },
   solutionText: {
     fontSize: 18,
     marginTop: 5,
+    marginBottom: 5,
     color: 'white'
   },
   actionButton: {
