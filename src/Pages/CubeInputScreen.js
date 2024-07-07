@@ -33,9 +33,12 @@ const CubeInputScreen = () => {
   const [algorithm, setAlgorithm] = useState('min2phase');
 
   useEffect(() => {
-    Cube.initSolver(); // Initialize the solver
-    min2phase.initFull(); // Initialize the min2phase solver
-
+    try {
+      min2phase.initFull(); // Initialize the min2phase solver
+      Cube.initSolver(); // Initialize the solver for the cubejs library
+    } catch (error) {
+      console.error(error);
+    }
     checkSolvability();
     const getAlgorithm = async () => {
       const savedAlgorithm = await AsyncStorage.getItem('solvingAlgorithm');
@@ -159,11 +162,13 @@ const CubeInputScreen = () => {
       let moves;
       console.log("Algorithm:", algorithm);
       if (algorithm === 'Kociemba') {
+
         const rearrangedString = rearrangeToKociemba(filteredCubeString);
         const cube = Cube.fromString(rearrangedString);
         moves = cube.solve();
         console.log('Kociemba Moves:', moves);
       } else if (algorithm === 'min2phase') {
+
         const rearrangedString = rearrangeToMin2Phase(filteredCubeString);
         console.log('min2phase Rearranged String:', rearrangedString);
         moves = min2phase.solve(rearrangedString);

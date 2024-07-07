@@ -292,7 +292,7 @@ const SolutionScreen = ({ route, navigation }) => {
         newState = rotateUp180(currentCubeState);
         break;
       case 'F':
-        newState = rotateFront(currentCubeState);
+        newState = rotateFront(rotateFrontInverse(rotateFront(currentCubeState)));
         break;
       case "Fprime":
       case "F'":
@@ -326,7 +326,7 @@ const SolutionScreen = ({ route, navigation }) => {
         break;
       case "Bprime":
       case "B'":
-        newState = rotateBackInverse(currentCubeState);
+        newState = rotateBackInverse(rotateBack(rotateBackInverse(currentCubeState)));
         break;
       case 'B2':
         newState = rotateBack180(currentCubeState);
