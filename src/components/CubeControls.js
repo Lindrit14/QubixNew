@@ -1,21 +1,23 @@
-// CubeControls.js
 import React from 'react';
 import { View, TouchableOpacity, Text, StyleSheet } from 'react-native';
+import { useLanguage } from '../context/LanguageContext';
 
 const CubeControls = ({ rotateCube }) => {
+    const { language } = useLanguage();
+
     return (
         <View style={styles.buttonContainer}>
             <TouchableOpacity style={styles.button} onPress={() => rotateCube(0, Math.PI / 6)}>
-                <Text>Up</Text>
+                <Text>{language === 'english' ? 'Up' : 'Hoch'}</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.button} onPress={() => rotateCube(0, -Math.PI / 6)}>
-                <Text>Down</Text>
+                <Text>{language === 'english' ? 'Down' : 'Runter'}</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.button} onPress={() => rotateCube(1, Math.PI / 6)}>
-                <Text>Left</Text>
+                <Text>{language === 'english' ? 'Left' : 'Links'}</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.button} onPress={() => rotateCube(1, -Math.PI / 6)}>
-                <Text>Right</Text>
+                <Text>{language === 'english' ? 'Right' : 'Rechts'}</Text>
             </TouchableOpacity>
         </View>
     );

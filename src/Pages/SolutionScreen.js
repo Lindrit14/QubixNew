@@ -6,6 +6,7 @@ import CubeTimer from '../components/CubeTimer';
 import CubeControls from '../components/CubeControls';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import LottieView from 'lottie-react-native';
+import { useLanguage } from '../context/LanguageContext';
 import {
   rotateRight,
   rotateRightInverse,
@@ -38,6 +39,7 @@ import {
 
 const SolutionScreen = ({ route, navigation }) => {
   const { cubeState, solutionAlgorithm, moves } = route.params;
+  const { language } = useLanguage();
   const [rotation, setRotation] = useState([0, 0, 0]);
   const [currentStep, setCurrentStep] = useState(0);
   const [solutionSteps, setSolutionSteps] = useState([]);
@@ -145,13 +147,13 @@ const SolutionScreen = ({ route, navigation }) => {
     console.log('Original Cube State:', cubeState);
 
     if (filteredCubeString.length !== 54 || !isValidCubeState(filteredCubeString)) {
-      console.error('Invalid cube state:', filteredCubeString);
+      console.error(language === 'english' ? 'Invalid cube state:' : 'Ungültiger Würfelzustand:', filteredCubeString);
       return;
     }
 
     if (checkIfSolved(cubeState)) {
-      console.log('The cube is already solved.');
-      setSolutionSteps(['Cube is already solved.']);
+      console.log(language === 'english' ? 'The cube is already solved.' : 'Der Würfel ist bereits gelöst.');
+      setSolutionSteps([language === 'english' ? 'Cube is already solved.' : 'Der Würfel ist bereits gelöst.']);
       setIsSolved(true);
       return;
     }
@@ -161,9 +163,9 @@ const SolutionScreen = ({ route, navigation }) => {
       setSolutionSteps(moves.split(' ').filter(step => step.trim() !== ''));
       setStartTime(new Date());
     } catch (error) {
-      console.error('Error solving cube:', error);
+      console.error(language === 'english' ? 'Error solving cube:' : 'Fehler beim Lösen des Würfels:', error);
     }
-  }, [cubeState, solutionAlgorithm]);
+  }, [cubeState, solutionAlgorithm, language]);
 
   const rotateCube = (axis, value) => {
     setRotation(prevRotation => {
@@ -237,7 +239,10 @@ const SolutionScreen = ({ route, navigation }) => {
       if (checkIfSolved(currentCubeState)) {
         setIsSolved(true);
         setShowCelebration(true);
-        Alert.alert("Cube Solved!", `Congratulations! You have solved the cube in ${overallTime.toFixed(2)} seconds.`);
+        Alert.alert(
+          language === 'english' ? "Cube Solved!" : "Würfel Gelöst!",
+          language === 'english' ? `Congratulations! You have solved the cube in ${overallTime.toFixed(2)} seconds.` : `Herzlichen Glückwunsch! Sie haben den Würfel in ${overallTime.toFixed(2)} Sekunden gelöst.`
+        );
         const solve = {
           date: new Date().toISOString(),
           steps: solutionSteps,
@@ -377,18 +382,21 @@ const SolutionScreen = ({ route, navigation }) => {
       isSolved,
       stepStartTime,
     });
-    Alert.alert("Progress Saved", "Your current progress has been saved.");
+    Alert.alert(
+      language === 'english' ? "Progress Saved" : "Fortschritt Gespeichert",
+      language === 'english' ? "Your current progress has been saved." : "Ihr aktueller Fortschritt wurde gespeichert."
+    );
   };
 
   const renderStep = ({ item, index }) => (
-    <Text style={styles.stepText}>Step {index + 1}: {item}</Text>
+    <Text style={styles.stepText}>{language === 'english' ? `Step ${index + 1}: ${item}` : `Schritt ${index + 1}: ${item}`}</Text>
   );
 
   const totalTimeTaken = stepTimes.reduce((acc, curr) => acc + curr.duration, 0).toFixed(2);
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Solution Screen</Text>
+      <Text style={styles.title}>{language === 'english' ? 'Solution Screen' : 'Lösungsbildschirm'}</Text>
       <CubeTimer overallTime={overallTime} />
       <View style={styles.cube3DContainer}>
         <RubiksCube3D cubeState={currentCubeState} rotation={rotation} />
@@ -403,11 +411,14 @@ const SolutionScreen = ({ route, navigation }) => {
           <Text style={styles.stepButtonText}>→</Text>
         </TouchableOpacity>
       </View>
+      <TouchableOpacity onPress={resetCube} style={styles.resetCube}>
+        <Text style={styles.buttonText}>{language === 'english' ? 'Reset Position' : 'Position Zurücksetzen'}</Text>
+      </TouchableOpacity>
       <TouchableOpacity style={styles.actionButton} onPress={saveProgress}>
-        <Text style={styles.buttonText}>Save Progress</Text>
+        <Text style={styles.buttonText}>{language === 'english' ? 'Save Progress' : 'Fortschritt Speichern'}</Text>
       </TouchableOpacity>
       <TouchableOpacity style={styles.actionButton} onPress={() => navigation.navigate('Analysis', { stepTimes, totalTimeTaken: overallTime.toFixed(2) })}>
-        <Text style={styles.buttonText}>Show Analysis</Text>
+        <Text style={styles.buttonText}>{language === 'english' ? 'Show Analysis' : 'Analyse Anzeigen'}</Text>
       </TouchableOpacity>
       {(currentStep < solutionSteps.length || !isSolved) && (
         <FlatList
@@ -417,8 +428,8 @@ const SolutionScreen = ({ route, navigation }) => {
           style={styles.stepList}
         />
       )}
-      <Text style={styles.currentStepText}>Current Step: {solutionSteps[currentStep]}</Text>
-      <Text style={styles.solutionText}>Solution Moves: {solutionSteps.join(' ')}</Text>
+      <Text style={styles.currentStepText}>{language === 'english' ? `Current Step: ${solutionSteps[currentStep]}` : `Aktueller Schritt: ${solutionSteps[currentStep]}`}</Text>
+      <Text style={styles.solutionText}>{language === 'english' ? `Solution Moves: ${solutionSteps.join(' ')}` : `Lösungszüge: ${solutionSteps.join(' ')}`}</Text>
       {showCelebration && (
         <LottieView
           source={require('../../assets/celebration.json')}
@@ -506,6 +517,14 @@ const styles = StyleSheet.create({
     bottom: 0,
     zIndex: 1,
   },
+  resetCube: {
+    backgroundColor: 'red',
+    padding: 10,
+    borderRadius: 5,
+    alignItems: 'center',
+    marginVertical: 5,
+    marginBottom: 5
+  }
 });
 
 export default SolutionScreen;

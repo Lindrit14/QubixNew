@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
+import { useLanguage } from '../context/LanguageContext';
 
 const AlgorithmScreen = () => {
-    const [algorithm, setAlgorithm] = useState('CFOP');
+    const [algorithm, setAlgorithm] = useState('min2phase');
+    const { language } = useLanguage();
 
     useEffect(() => {
         const getAlgorithm = async () => {
@@ -23,9 +24,18 @@ const AlgorithmScreen = () => {
 
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>Select Solving Algorithm</Text>
-            <Text style={styles.selectedAlgorithmText}>Currently Selected: {algorithm}</Text>
-            <Text style={styles.selectedAlgorithmText}>Reset Cube after choosing!</Text>
+            <Text style={styles.title}>
+                {language === 'english' ? 'Solving Algorithm' : 'Lösungsalgorithmus'}
+            </Text>
+            <Text style={styles.selectedAlgorithmText}>
+                {language === 'english' ? 'Currently Selected: ' : 'Derzeit ausgewählt: '} {algorithm}
+            </Text>
+            <Text style={styles.selectedAlgorithmText}>
+                {language === 'english' ? 'Reset Cube after choosing!' : 'Setzen Sie den Würfel nach einer neuen Auswahl zurück!'}
+            </Text>
+            <Text style={styles.selectedAlgorithmText}>
+                {language === 'english' ? 'We recommend using the min2phase algorithm' : 'Wir empfehlen die Verwendung des min2phase-Algorithmus'}
+            </Text>
             <View style={styles.buttonContainer}>
                 <TouchableOpacity
                     style={[styles.algorithmButton, algorithm === 'CFOP' && styles.selectedButton]}
@@ -40,7 +50,6 @@ const AlgorithmScreen = () => {
                     <Text style={styles.buttonText}>min2phase</Text>
                 </TouchableOpacity>
             </View>
-
         </View>
     );
 };

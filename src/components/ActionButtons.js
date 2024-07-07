@@ -1,18 +1,24 @@
 import React from 'react';
-import { View, TouchableOpacity, StyleSheet, Text } from 'react-native';
+import { View, TouchableOpacity, StyleSheet, Text, Alert } from 'react-native';
+import { useLanguage } from '../context/LanguageContext';
 
 const ActionButtons = ({ isSolvable, handleSolve, resetCube, handleLogout, navigation }) => {
+    const { language } = useLanguage();
+
     return (
         <View style={styles.buttonContainer}>
             <TouchableOpacity
                 style={[styles.actionButton, { backgroundColor: isSolvable ? 'blue' : 'gray' }]}
-                onPress={() => isSolvable ? handleSolve() : Alert.alert("Unsolvable Configuration", "Please adjust your cube configuration before solving.")}
+                onPress={() => isSolvable ? handleSolve() : Alert.alert(
+                    language === 'english' ? "Unsolvable Configuration" : "Unlösbare Konfiguration",
+                    language === 'english' ? "Please adjust your cube configuration before solving." : "Bitte passen Sie Ihre Würfelkonfiguration an, bevor Sie lösen."
+                )}
                 disabled={!isSolvable}
             >
-                <Text style={styles.buttonText}>Solve Cube</Text>
+                <Text style={styles.buttonText}>{language === 'english' ? 'Solve Cube' : 'Würfel Lösen'}</Text>
             </TouchableOpacity>
             <TouchableOpacity style={[styles.actionButton, { backgroundColor: 'blue' }]} onPress={() => navigation.navigate('InputInfo')}>
-                <Text style={styles.buttonText}>Input Info</Text>
+                <Text style={styles.buttonText}>{language === 'english' ? 'Input Info' : 'Eingabe Info'}</Text>
             </TouchableOpacity>
             {/*  
             <TouchableOpacity style={[styles.actionButton, { backgroundColor: 'blue' }]} onPress={() => navigation.navigate('CubeTester')}>
@@ -20,10 +26,10 @@ const ActionButtons = ({ isSolvable, handleSolve, resetCube, handleLogout, navig
             </TouchableOpacity>
             */}
             <TouchableOpacity style={[styles.actionButton, { backgroundColor: 'orange' }]} onPress={resetCube}>
-                <Text style={styles.buttonText}>Reset Cube</Text>
+                <Text style={styles.buttonText}>{language === 'english' ? 'Reset Cube' : 'Würfel Zurücksetzen'}</Text>
             </TouchableOpacity>
             <TouchableOpacity style={[styles.actionButton, { backgroundColor: 'red' }]} onPress={handleLogout}>
-                <Text style={styles.buttonText}>Logout</Text>
+                <Text style={styles.buttonText}>{language === 'english' ? 'Logout' : 'Abmelden'}</Text>
             </TouchableOpacity>
         </View>
     );

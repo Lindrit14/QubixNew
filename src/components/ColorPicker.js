@@ -1,12 +1,15 @@
 import React from 'react';
 import { View, TouchableOpacity, StyleSheet, Text } from 'react-native';
+import { useLanguage } from '../context/LanguageContext';
 
 const colors = ['white', 'red', 'blue', 'orange', 'green', 'yellow'];
 
 const ColorPicker = ({ selectedColor, setSelectedColor }) => {
+    const { language } = useLanguage();
+
     return (
         <View>
-            <Text style={styles.title}>Select Color</Text>
+            <Text style={styles.title}>{language === 'english' ? 'Select Color' : 'Farbe Wählen'}</Text>
             <View style={styles.colorContainer}>
                 {colors.map(color => (
                     <TouchableOpacity
@@ -16,7 +19,7 @@ const ColorPicker = ({ selectedColor, setSelectedColor }) => {
                     />
                 ))}
             </View>
-            <Text style={styles.selectedColor}>Selected Color: {selectedColor}</Text>
+            <Text style={styles.selectedColor}>{language === 'english' ? 'Selected Color:' : 'Ausgewählte Farbe:'} {selectedColor}</Text>
         </View>
     );
 };

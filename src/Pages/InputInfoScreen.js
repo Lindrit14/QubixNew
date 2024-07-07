@@ -1,16 +1,25 @@
 import React from 'react';
 import { View, Text, Image, StyleSheet, ScrollView } from 'react-native';
+import { useLanguage } from '../context/LanguageContext';
 
 const InputInfoScreen = () => {
+    const { language } = useLanguage();
+    console.log(language);
+
     return (
         <ScrollView contentContainerStyle={styles.container}>
-            <Text style={styles.title}>Cube Input Information</Text>
-            <Text style={styles.infoText}>Default Cube Position:</Text>
+            <Text style={styles.title}>
+                {language === 'english' ? 'Cube Input Information' : 'Würfel Eingabeinformationen'}
+            </Text>
+            <Text style={styles.infoText}>
+                {language === 'english' ? 'Default Cube Position:' : 'Standardwürfelposition:'}
+            </Text>
             <Image source={require('../../assets/CubeLayout.png')} style={styles.image} />
             <Text style={styles.infoText}>
-                It's important to always know which face is where so you can correctly input the colors.
-                If you input the colors incorrectly, the algorithms will not work properly. Make sure you
-                follow the default cube position as shown in the image above.
+                {language === 'english'
+                    ? "It's important to always know which face is where so you can correctly input the colors. If you input the colors incorrectly, the algorithms will not work properly. Make sure you follow the default cube position as shown in the image above."
+                    : "Es ist wichtig, immer zu wissen, welche Seite wo ist, damit Sie die Farben korrekt eingeben können. Wenn Sie die Farben falsch eingeben, funktionieren die Algorithmen nicht richtig. Stellen Sie sicher, dass Sie die Standardwürfelposition wie im obigen Bild gezeigt befolgen."
+                }
             </Text>
         </ScrollView>
     );

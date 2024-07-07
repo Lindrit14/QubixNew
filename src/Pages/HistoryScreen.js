@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, FlatList } from 'react-native';
 import { getSolvingHistory } from '../components/solvingHistory';
+import { useLanguage } from '../context/LanguageContext';
 
 const HistoryScreen = () => {
     const [solvingHistory, setSolvingHistory] = useState([]);
+    const { language } = useLanguage();
 
     useEffect(() => {
         const fetchSolvingHistory = async () => {
@@ -21,16 +23,24 @@ const HistoryScreen = () => {
 
     const renderItem = ({ item }) => (
         <View style={styles.historyItem}>
-            <Text style={styles.historyText}>{`Date: ${formatDate(item.date)}`}</Text>
-            <Text style={styles.historyText}>{`Steps: ${item.steps.join(' ')}`}</Text>
+            <Text style={styles.historyText}>
+                {language === 'english' ? 'Date: ' : 'Datum: '}{formatDate(item.date)}
+            </Text>
+            <Text style={styles.historyText}>
+                {language === 'english' ? 'Steps: ' : 'Schritte: '}{item.steps.join(' ')}
+            </Text>
         </View>
     );
 
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>Solving History</Text>
+            <Text style={styles.title}>
+                {language === 'english' ? 'Solving History' : 'Lösungsgeschichte'}
+            </Text>
             {solvingHistory.length === 0 ? (
-                <Text style={styles.noHistory}>No solving history found.</Text>
+                <Text style={styles.noHistory}>
+                    {language === 'english' ? 'No solving history found.' : 'Keine Lösungsgeschichte gefunden.'}
+                </Text>
             ) : (
                 <FlatList
                     data={solvingHistory}
@@ -60,7 +70,7 @@ const styles = StyleSheet.create({
         fontSize: 18,
         textAlign: 'center',
         marginTop: 20,
-        color: '#ffffff'
+        color: '#ffffff',
     },
     listContent: {
         paddingBottom: 20,

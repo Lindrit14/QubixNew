@@ -1,12 +1,13 @@
-// SettingsScreen.js
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { auth } from '../firebase/firebaseConfig';
+import { useLanguage } from '../context/LanguageContext';
 
 const SettingsScreen = () => {
     const navigation = useNavigation();
     const [userEmail, setUserEmail] = useState('');
+    const { language, changeLanguage } = useLanguage();
 
     useEffect(() => {
         const user = auth.currentUser;
@@ -17,14 +18,41 @@ const SettingsScreen = () => {
 
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>Settings</Text>
-            {userEmail ? <Text style={styles.emailText}>Logged in as: {userEmail}</Text> : null}
+            <Text style={styles.title}>
+                {language === 'english' ? 'Settings' : 'Einstellungen'}
+            </Text>
+            {userEmail ? (
+                <Text style={styles.emailText}>
+                    {language === 'english' ? `Logged in as: ${userEmail}` : `Eingeloggt als: ${userEmail}`}
+                </Text>
+            ) : null}
             <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('History')}>
-                <Text style={styles.buttonText}>Solving History</Text>
+                <Text style={styles.buttonText}>
+                    {language === 'english' ? 'Solving History' : 'Lösungs Verlauf'}
+                </Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Algorithm')}>
-                <Text style={styles.buttonText}>Solving Algorithm</Text>
+                <Text style={styles.buttonText}>
+                    {language === 'english' ? 'Solving Algorithm' : 'Lösungs Algorithmus'}
+                </Text>
             </TouchableOpacity>
+            <View style={styles.languageContainer}>
+                <TouchableOpacity onPress={() => changeLanguage('english')}>
+                    <Image
+                        source={require('../../assets/english.png')}
+                        style={[styles.flag, language === 'english' ? {} : styles.selectedFlag]}
+                    />
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => changeLanguage('german')}>
+                    <Image
+                        source={require('../../assets/german.png')}
+                        style={[styles.flag, language === 'german' ? {} : styles.selectedFlag]}
+                    />
+                </TouchableOpacity>
+            </View>
+            <Text style={styles.selectedLanguageText}>
+                {language === 'english' ? 'Selected Language: English' : 'Ausgewählte Sprache: Deutsch'}
+            </Text>
         </View>
     );
 };
@@ -59,6 +87,23 @@ const styles = StyleSheet.create({
     buttonText: {
         color: 'white',
         fontSize: 18,
+    },
+    languageContainer: {
+        flexDirection: 'row',
+        marginVertical: 20,
+    },
+    flag: {
+        width: 50,
+        height: 30,
+        marginHorizontal: 10,
+    },
+    selectedFlag: {
+        opacity: 0.3,
+    },
+    selectedLanguageText: {
+        fontSize: 16,
+        color: 'white',
+        marginTop: 20,
     },
 });
 

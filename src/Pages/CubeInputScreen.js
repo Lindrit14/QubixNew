@@ -11,11 +11,13 @@ import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import min2phase from 'min2phase.js';
 import { loadCurrentProgress } from '../components/solvingHistory';
+import { useLanguage } from '../context/LanguageContext';
 
 const initialFaceState = new Array(9).fill('white');
 
 const CubeInputScreen = () => {
   const navigation = useNavigation();
+  const { language } = useLanguage();
   const [cubeState, setCubeState] = useState({
     U: [...initialFaceState],
     L: [...initialFaceState],
@@ -27,7 +29,7 @@ const CubeInputScreen = () => {
   const [selectedColor, setSelectedColor] = useState('white');
   const [isSolvable, setIsSolvable] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [algorithm, setAlgorithm] = useState('CFOP');
+  const [algorithm, setAlgorithm] = useState('min2phase');
 
   useEffect(() => {
     checkSolvability();
@@ -123,25 +125,28 @@ const CubeInputScreen = () => {
         moves = solver(filteredCubeString); // Use CFOP
       } else if (algorithm === 'min2phase') {
         min2phase.initFull();
-        /*
-        var cube = min2phase.randomCube();
-        console.log('min2phase Cube:', cube);
-        */
         const rearrangedString = rearrangeToMin2Phase(filteredCubeString);
         console.log('min2phase Rearranged String:', rearrangedString);
         moves = min2phase.solve(rearrangedString);
         console.log('min2phase Moves:', moves);
-      } else {
-        throw new Error('Unsupported algorithm selected');
-      }
 
+        // Check if moves contain an error
+        if (moves.includes("Error")) {
+          throw new Error("Unsolvable Configuration");
+        }
+      } else {
+        throw new Error(language === 'english' ? 'Unsupported algorithm selected' : 'Nicht unterstützter Algorithmus ausgewählt');
+      }
 
       setLoading(false);
       navigation.navigate('Solution', { cubeState, solutionAlgorithm: algorithm, moves: moves });
     } catch (error) {
       setLoading(false);
       console.error(error);
-      Alert.alert("Unsolvable Configuration", "Please adjust your cube configuration before solving.");
+      Alert.alert(
+        language === 'english' ? 'Unsolvable Configuration' : 'Unlösbare Konfiguration',
+        language === 'english' ? 'Please adjust your cube configuration before solving.' : 'Bitte passen Sie Ihre Würfelkonfiguration an, bevor Sie lösen.'
+      );
     }
   };
 
@@ -149,9 +154,15 @@ const CubeInputScreen = () => {
     const progress = await loadCurrentProgress();
     if (progress) {
       setCubeState(progress.currentCubeState);
-      Alert.alert("Progress Loaded", "Your previous progress has been loaded.");
+      Alert.alert(
+        language === 'english' ? 'Progress Loaded' : 'Fortschritt Geladen',
+        language === 'english' ? 'Your previous progress has been loaded.' : 'Ihr vorheriger Fortschritt wurde geladen.'
+      );
     } else {
-      Alert.alert("No Saved Progress", "There is no saved progress to load.");
+      Alert.alert(
+        language === 'english' ? 'No Saved Progress' : 'Kein Gespeicherter Fortschritt',
+        language === 'english' ? 'There is no saved progress to load.' : 'Es gibt keinen gespeicherten Fortschritt zum Laden.'
+      );
     }
   };
 
@@ -168,12 +179,12 @@ const CubeInputScreen = () => {
           navigation={navigation}
         />
         <TouchableOpacity style={styles.actionButton} onPress={loadProgress}>
-          <Text style={styles.buttonText}>Load Progress</Text>
+          <Text style={styles.buttonText}>{language === 'english' ? 'Load Progress' : 'Fortschritt Laden'}</Text>
         </TouchableOpacity>
         <Modal visible={loading} transparent>
           <View style={styles.loadingContainer}>
             <ActivityIndicator size="large" color="#00ff00" />
-            <Text style={styles.loadingText}>Checking if solvable...</Text>
+            <Text style={styles.loadingText}>{language === 'english' ? 'Checking if solvable...' : 'Überprüfung, ob lösbar...'}</Text>
           </View>
         </Modal>
       </ScrollView>

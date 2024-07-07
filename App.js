@@ -13,8 +13,47 @@ import HistoryScreen from './src/Pages/HistoryScreen';
 import SettingsScreen from './src/Pages/SettingsScreen';
 import AlgorithmScreen from './src/Pages/AlgorithmScreen';
 import CubeTester from './src/Pages/CubeTester';
+import { LanguageProvider, useLanguage } from './src/context/LanguageContext';
+import { titles } from './titles';
 
 const Stack = createNativeStackNavigator();
+
+const AppContent = ({ user }) => {
+  const { language } = useLanguage();
+
+  return (
+    <Stack.Navigator
+      initialRouteName={user ? "CubeInput" : "Login"}
+      screenOptions={{
+        headerStyle: {
+          backgroundColor: '#20232a',
+        },
+        headerTintColor: '#ffffff',
+        headerTitleStyle: {
+          fontWeight: 'bold',
+        },
+      }}
+    >
+      {user ? (
+        <>
+          <Stack.Screen name="CubeInput" component={CubeInputScreen} options={{ title: titles[language].CubeInput }} />
+          <Stack.Screen name="Solution" component={SolutionScreen} options={{ title: titles[language].Solution }} />
+          <Stack.Screen name="InputInfo" component={InputInfoScreen} options={{ title: titles[language].InputInfo }} />
+          <Stack.Screen name="Analysis" component={AnalysisScreen} options={{ title: titles[language].Analysis }} />
+          <Stack.Screen name="History" component={HistoryScreen} options={{ title: titles[language].History }} />
+          <Stack.Screen name="Settings" component={SettingsScreen} options={{ title: titles[language].Settings }} />
+          <Stack.Screen name="Algorithm" component={AlgorithmScreen} options={{ title: titles[language].Algorithm }} />
+          <Stack.Screen name="CubeTester" component={CubeTester} options={{ title: titles[language].CubeTester }} />
+        </>
+      ) : (
+        <>
+          <Stack.Screen name="Login" component={LoginScreen} options={{ title: titles[language].Login }} />
+          <Stack.Screen name="Register" component={RegisterScreen} options={{ title: titles[language].Register }} />
+        </>
+      )}
+    </Stack.Navigator>
+  );
+};
 
 export default function App() {
   const [user, setUser] = useState(null);
@@ -28,37 +67,10 @@ export default function App() {
   }, []);
 
   return (
-    <NavigationContainer>
-      <Stack.Navigator
-        initialRouteName={user ? "CubeInput" : "Login"}
-        screenOptions={{
-          headerStyle: {
-            backgroundColor: '#20232a',  // Change this to your desired color
-          },
-          headerTintColor: '#ffffff',  // Text color of the header
-          headerTitleStyle: {
-            fontWeight: 'bold',
-          },
-        }}
-      >
-        {user ? (
-          <>
-            <Stack.Screen name="CubeInput" component={CubeInputScreen} />
-            <Stack.Screen name="Solution" component={SolutionScreen} />
-            <Stack.Screen name="InputInfo" component={InputInfoScreen} />
-            <Stack.Screen name="Analysis" component={AnalysisScreen} />
-            <Stack.Screen name="History" component={HistoryScreen} />
-            <Stack.Screen name="Settings" component={SettingsScreen} />
-            <Stack.Screen name="Algorithm" component={AlgorithmScreen} />
-            <Stack.Screen name="CubeTester" component={CubeTester} />
-          </>
-        ) : (
-          <>
-            <Stack.Screen name="Login" component={LoginScreen} />
-            <Stack.Screen name="Register" component={RegisterScreen} />
-          </>
-        )}
-      </Stack.Navigator>
-    </NavigationContainer>
+    <LanguageProvider>
+      <NavigationContainer>
+        <AppContent user={user} />
+      </NavigationContainer>
+    </LanguageProvider>
   );
 }

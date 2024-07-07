@@ -1,5 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { auth } from '../firebase/firebaseConfig';
+import { useLanguage } from '../context/LanguageContext';
 
 const getKeyWithUserEmail = (key) => {
     const userEmail = auth.currentUser ? auth.currentUser.email : 'default';
@@ -17,7 +18,8 @@ export const saveSolve = async (solve) => {
         await AsyncStorage.setItem(key, JSON.stringify(history));
         console.log('Saving solve:', solve);
     } catch (error) {
-        console.error('Error saving solving history:', error);
+        const { language } = useLanguage();
+        console.error(language === 'english' ? 'Error saving solving history:' : 'Fehler beim Speichern der Lösungsgeschichte:', error);
     }
 };
 
@@ -27,7 +29,8 @@ export const getSolvingHistory = async () => {
         const history = await AsyncStorage.getItem(key);
         return history ? JSON.parse(history) : [];
     } catch (error) {
-        console.error('Error fetching solving history:', error);
+        const { language } = useLanguage();
+        console.error(language === 'english' ? 'Error fetching solving history:' : 'Fehler beim Abrufen der Lösungsgeschichte:', error);
         return [];
     }
 };
@@ -38,7 +41,8 @@ export const saveCurrentProgress = async (progress) => {
         await AsyncStorage.setItem(key, JSON.stringify(progress));
         console.log('Saving current progress:', progress);
     } catch (error) {
-        console.error('Error saving current progress:', error);
+        const { language } = useLanguage();
+        console.error(language === 'english' ? 'Error saving current progress:' : 'Fehler beim Speichern des aktuellen Fortschritts:', error);
     }
 };
 
@@ -48,7 +52,8 @@ export const loadCurrentProgress = async () => {
         const progress = await AsyncStorage.getItem(key);
         return progress ? JSON.parse(progress) : null;
     } catch (error) {
-        console.error('Error loading current progress:', error);
+        const { language } = useLanguage();
+        console.error(language === 'english' ? 'Error loading current progress:' : 'Fehler beim Laden des aktuellen Fortschritts:', error);
         return null;
     }
 };
@@ -59,6 +64,7 @@ export const clearCurrentProgress = async () => {
         await AsyncStorage.removeItem(key);
         console.log('Cleared current progress');
     } catch (error) {
-        console.error('Error clearing current progress:', error);
+        const { language } = useLanguage();
+        console.error(language === 'english' ? 'Error clearing current progress:' : 'Fehler beim Löschen des aktuellen Fortschritts:', error);
     }
 };
